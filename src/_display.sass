@@ -101,6 +101,23 @@
 
 
 // -----------------------------------------------------------------------------
+// Fixed Sizing (px)
+// -----------------------------------------------------------------------------
+// Generates .w-Xpx and .h-Xpx for values from 1 to 64.
+// Useful for fixed-size elements like headers, icons and buttons.
+
+@for $i from 1 through 64
+  .w-#{$i}px
+    width: #{$i}px !important
+  .h-#{$i}px
+    height: #{$i}px !important
+  .min-w-#{$i}px
+    min-width: #{$i}px !important
+  .min-h-#{$i}px
+    min-height: #{$i}px !important
+
+
+// -----------------------------------------------------------------------------
 // Positioning
 // -----------------------------------------------------------------------------
 // `.position-relative`, `.position-absolute`, `.position-fixed`,
