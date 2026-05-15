@@ -1,0 +1,85 @@
+// Typography scale
+$fs-px-values: (10, 12, 13, 14, 15, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64)
+$fs-rem-values: (0.75, 0.875, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5)
+$fs-em-values: (1, 1.2, 1.5, 2)
+
+@function str-replace($string, $search, $replace: "")
+  $index: str-index($string, $search)
+  @if $index
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace)
+  @return $string
+
+@mixin generate-fs($value, $unit)
+  $val-str: str-replace("#{$value}", ".", "-")
+  $unit-sep: if($unit == "px", "", "-")
+  
+  .fs-#{$val-str}#{$unit-sep}#{$unit}
+    font-size: #{$value}#{$unit} !important
+  
+  .fs-#{$val-str}#{$unit-sep}#{$unit}-m
+    @include mobile
+      font-size: #{$value}#{$unit} !important
+  
+  .fs-#{$val-str}#{$unit-sep}#{$unit}-t
+    @include tablet
+      font-size: #{$value}#{$unit} !important
+
+// Generate Scales
+@each $val in $fs-px-values
+  @include generate-fs($val, "px")
+
+@each $val in $fs-rem-values
+  @include generate-fs($val, "rem")
+
+@each $val in $fs-em-values
+  @include generate-fs($val, "em")
+
+// Font Weight
+$weights: (100, 200, 300, 400, 500, 600, 700, 800, 900)
+@each $weight in $weights
+  .fw-#{$weight}
+    font-weight: #{$weight} !important
+
+.fw-bold
+  font-weight: bold !important
+.fw-normal
+  font-weight: normal !important
+
+// Text Alignment
+$aligns: left, center, right, justify
+@each $align in $aligns
+  .text-#{$align}
+    text-align: $align !important
+  .text-#{$align}-m
+    @include mobile
+      text-align: $align !important
+  .text-#{$align}-t
+    @include tablet
+      text-align: $align !important
+
+// Text Transformation
+$transforms: uppercase, lowercase, capitalize, none
+@each $trans in $transforms
+  .text-#{$trans}
+    text-transform: $trans !important
+
+// Line Height
+@for $i from 1 through 4
+  .lh-#{$i}
+    line-height: #{$i} !important
+  .lh-#{$i}-5
+    line-height: #{$i + 0.5} !important
+
+// White Space
+.ws-nowrap
+  white-space: nowrap !important
+.ws-normal
+  white-space: normal !important
+.ws-pre
+  white-space: pre !important
+
+// Text Overflow
+.text-ellipsis
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap

@@ -1,0 +1,195 @@
+@use 'variables' as *
+@use 'mixins' as *
+
+// Display
+@each $display in $displays
+  .d-#{$display}
+    display: $display
+  .d-#{$display}-i
+    display: $display !important
+  .d-#{$display}-m
+    @include mobile
+      display: $display !important
+  .d-#{$display}-t
+    @include tablet
+      display: $display !important
+
+// Width & Height
+$sizes: 0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100
+@each $size in $sizes
+  .w-#{$size}
+    width: #{$size}%
+  .w-#{$size}-m
+    @include mobile
+      width: #{$size}% !important
+  .w-#{$size}-t
+    @include tablet
+      width: #{$size}% !important
+  
+  .h-#{$size}
+    height: #{$size}%
+  .h-#{$size}-m
+    @include mobile
+      height: #{$size}% !important
+  .h-#{$size}-t
+    @include tablet
+      height: #{$size}% !important
+
+.w-max-content
+  width: max-content
+.w-max-content-m
+  @include mobile
+    width: max-content !important
+.w-max-content-t
+  @include tablet
+    width: max-content !important
+
+.w-100vw
+  width: 100vw
+.h-100vh
+  height: 100vh
+
+// Positioning
+@each $pos in $positions
+  .position-#{$pos}
+    position: $pos
+  .position-#{$pos}-m
+    @include mobile
+      position: $pos
+  .position-#{$pos}-t
+    @include tablet
+      position: $pos
+
+// Flexbox Alignment
+@each $align in $alignments
+  $suffix: $align
+  @if $align == 'flex-start'
+    $suffix: 'start'
+  @else if $align == 'flex-end'
+    $suffix: 'end'
+
+  .align-items-#{$suffix}
+    align-items: #{$align}
+  .align-items-#{$suffix}-m
+    @include mobile
+      align-items: #{$align} !important
+  .align-items-#{$suffix}-t
+    @include tablet
+      align-items: #{$align} !important
+
+  .align-self-#{$suffix}
+    align-self: #{$align}
+  .align-self-#{$suffix}-m
+    @include mobile
+      align-self: #{$align} !important
+  .align-self-#{$suffix}-t
+    @include tablet
+      align-self: #{$align} !important
+
+  .align-content-#{$suffix}
+    align-content: #{$align}
+  .align-content-#{$suffix}-m
+    @include mobile
+      align-content: #{$align} !important
+  .align-content-#{$suffix}-t
+    @include tablet
+      align-content: #{$align} !important
+
+// Justification
+@each $just in $justifications
+  $suffix: $just
+  @if $just == 'flex-start'
+    $suffix: 'start'
+  @else if $just == 'flex-end'
+    $suffix: 'end'
+
+  .justify-content-#{$suffix}
+    justify-content: #{$just}
+  .justify-content-#{$suffix}-m
+    @include mobile
+      justify-content: #{$just} !important
+  .justify-content-#{$suffix}-t
+    @include tablet
+      justify-content: #{$just} !important
+
+  .justify-items-#{$suffix}
+    justify-items: #{$just}
+  .justify-items-#{$suffix}-m
+    @include mobile
+      justify-items: #{$just} !important
+  .justify-items-#{$suffix}-t
+    @include tablet
+      justify-items: #{$just} !important
+
+  .justify-self-#{$suffix}
+    justify-self: #{$just}
+  .justify-self-#{$suffix}-m
+    @include mobile
+      justify-self: #{$just} !important
+  .justify-self-#{$suffix}-t
+    @include tablet
+      justify-self: #{$just} !important
+
+// Flex utilities
+@for $i from 0 through 1
+  .flex-#{$i}
+    flex: $i
+  .flex-grow-#{$i}
+    flex-grow: $i
+  .flex-grow-#{$i}-m
+    @include mobile
+      flex-grow: $i !important
+  .flex-grow-#{$i}-t
+    @include tablet
+      flex-grow: $i !important
+  
+  .flex-shrink-#{$i}
+    flex-shrink: $i
+  .flex-shrink-#{$i}-m
+    @include mobile
+      flex-shrink: $i !important
+  .flex-shrink-#{$i}-t
+    @include tablet
+      flex-shrink: $i !important
+
+.flex-none
+  flex: none
+.flex-none-m
+  @include mobile
+    flex: none !important
+.flex-none-t
+  @include tablet
+    flex: none !important
+
+@each $wrap in $flex-wraps
+  .flex-#{$wrap}
+    flex-wrap: $wrap
+  .flex-#{$wrap}-m
+    @include mobile
+      flex-wrap: $wrap !important
+  .flex-#{$wrap}-t
+    @include tablet
+      flex-wrap: $wrap !important
+
+@each $dir in $flex-directions
+  .flex-direction-#{$dir}
+    flex-direction: #{$dir}
+  .flex-direction-#{$dir}-m
+    @include mobile
+      flex-direction: #{$dir} !important
+  .flex-direction-#{$dir}-t
+    @include tablet
+      flex-direction: #{$dir} !important
+
+// Object fit
+.object-cover
+  object-fit: cover
+.object-contain
+  object-fit: contain
+
+// Z-index
+@for $i from 1 through 10
+  .z-#{$i}
+    z-index: $i
+  .z-#{$i}0
+    z-index: #{$i}0

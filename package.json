@@ -1,0 +1,17 @@
+{
+  "name": "@vcalderondev/sass-ruleset",
+  "version": "1.0.0",
+  "description": "Unified SASS ruleset for layout and positioning",
+  "main": "src/index.sass",
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "sass",
+    "utilities",
+    "layout",
+    "css"
+  ],
+  "author": "vcalderondev",
+  "license": "ISC"
+}
