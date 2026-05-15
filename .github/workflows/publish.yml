@@ -8,19 +8,43 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # `id-token: write` is required so the runner can mint an OIDC token,
+    # which npm uses both for provenance attestations and for Trusted
+    # Publisher authentication (no long-lived NPM_TOKEN needed).
     permissions:
       contents: read
       id-token: write
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-      
+
+      # Avoid re-publishing the same version on every push to main.
+      # Reads name + version from package.json and queries the registry;
+      # if the version exists, the publish step is skipped.
+      - name: Check if version is already published
+        id: check
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Checking ${NAME}@${VERSION}..."
+          if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
+            echo "::notice::${NAME}@${VERSION} already published — skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::${NAME}@${VERSION} not yet published — will publish."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to NPM
+        if: steps.check.outputs.skip == 'false'
         run: npm publish --provenance --access public
         env:
+          # Kept as a fallback in case Trusted Publisher (OIDC) is not
+          # configured yet. Once OIDC is set up on npm, this env var can be
+          # removed entirely.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        # Skip if version already exists
-        continue-on-error: true
