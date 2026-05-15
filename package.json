@@ -1,8 +1,13 @@
 {
   "name": "@vcalderondev/sass-ruleset",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Unified SASS utility library",
   "main": "src/_index.sass",
+  "sass": "src/_index.sass",
+  "style": "src/_index.sass",
+  "exports": {
+    ".": "./src/_index.sass"
+  },
   "files": [
     "src"
   ],
