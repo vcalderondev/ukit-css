@@ -1,6 +1,6 @@
 {
   "name": "@vcalderondev/sasskit",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "The definitive utility-first SASS toolkit for modern web development.",
   "main": "src/_index.sass",
   "sass": "src/_index.sass",
