@@ -13,48 +13,48 @@ $em-values: (1, 1.5, 2)
   
   // If value is 0, we can simplify but keeping consistency
   @if $value == 0
-  $class-name: "#{$prefix}-0"
+    $class-name: "#{$prefix}-0"
 
   .#{$class-name}
-  #{$property}: #{$value}#{$unit} !important
+    #{$property}: #{$value}#{$unit} !important
   
   .#{$class-name}-m
-  @include mobile
-    #{$property}: #{$value}#{$unit} !important
+    @include mobile
+      #{$property}: #{$value}#{$unit} !important
   
   .#{$class-name}-t
-  @include tablet
-    #{$property}: #{$value}#{$unit} !important
+    @include tablet
+      #{$property}: #{$value}#{$unit} !important
 
 @mixin spacing-group($unit, $values)
   @each $val in $values
-  // Gap
-  @include generate-spacing-item("gap", "gap", $val, $unit)
+    // Gap
+    @include generate-spacing-item("gap", "gap", $val, $unit)
 
-  // Margin & Padding Full
-  @include generate-spacing-item("margin", "m", $val, $unit)
-  @include generate-spacing-item("padding", "p", $val, $unit)
+    // Margin & Padding Full
+    @include generate-spacing-item("margin", "m", $val, $unit)
+    @include generate-spacing-item("padding", "p", $val, $unit)
 
-  // Directional
-  @each $name, $pref in $directions
-    @include generate-spacing-item("margin-#{$name}", "m#{$pref}", $val, $unit)
-    @include generate-spacing-item("padding-#{$name}", "p#{$pref}", $val, $unit)
+    // Directional
+    @each $name, $pref in $directions
+      @include generate-spacing-item("margin-#{$name}", "m#{$pref}", $val, $unit)
+      @include generate-spacing-item("padding-#{$name}", "p#{$pref}", $val, $unit)
 
-  // Axis
-  $val-str: str-replace("#{$val}", ".", "-")
-  $unit-sep: if($unit == "px", "", "-")
-  $suffix: if($val == 0, "0", "#{$val-str}#{$unit-sep}#{$unit}")
+    // Axis
+    $val-str: str-replace("#{$val}", ".", "-")
+    $unit-sep: if($unit == "px", "", "-")
+    $suffix: if($val == 0, "0", "#{$val-str}#{$unit-sep}#{$unit}")
 
-  @each $ax, $dirs in $axis
-    .m#{$ax}-#{$suffix}
-    @each $dir in $dirs
-      $dir-name: map-get(("t": "top", "b": "bottom", "l": "left", "r": "right", "s": "inline-start", "e": "inline-end"), $dir)
-      margin-#{$dir-name}: #{$val}#{$unit} !important
-    
-    .p#{$ax}-#{$suffix}
-    @each $dir in $dirs
-      $dir-name: map-get(("t": "top", "b": "bottom", "l": "left", "r": "right", "s": "inline-start", "e": "inline-end"), $dir)
-      padding-#{$dir-name}: #{$val}#{$unit} !important
+    @each $ax, $dirs in $axis
+      .m#{$ax}-#{$suffix}
+        @each $dir in $dirs
+          $dir-name: map-get(("t": "top", "b": "bottom", "l": "left", "r": "right", "s": "inline-start", "e": "inline-end"), $dir)
+          margin-#{$dir-name}: #{$val}#{$unit} !important
+      
+      .p#{$ax}-#{$suffix}
+        @each $dir in $dirs
+          $dir-name: map-get(("t": "top", "b": "bottom", "l": "left", "r": "right", "s": "inline-start", "e": "inline-end"), $dir)
+          padding-#{$dir-name}: #{$val}#{$unit} !important
 
 // Generate Scales
 @include spacing-group("rem", $rem-values)

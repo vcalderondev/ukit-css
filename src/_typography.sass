@@ -10,15 +10,15 @@ $fs-em-values: (1, 1.2, 1.5, 2)
   $unit-sep: if($unit == "px", "", "-")
   
   .fs-#{$val-str}#{$unit-sep}#{$unit}
-  font-size: #{$value}#{$unit} !important
+    font-size: #{$value}#{$unit} !important
   
   .fs-#{$val-str}#{$unit-sep}#{$unit}-m
-  @include mobile
-    font-size: #{$value}#{$unit} !important
+    @include mobile
+      font-size: #{$value}#{$unit} !important
   
   .fs-#{$val-str}#{$unit-sep}#{$unit}-t
-  @include tablet
-    font-size: #{$value}#{$unit} !important
+    @include tablet
+      font-size: #{$value}#{$unit} !important
 
 // Generate Scales
 @each $val in $fs-px-values
@@ -34,7 +34,7 @@ $fs-em-values: (1, 1.2, 1.5, 2)
 $weights: (100, 200, 300, 400, 500, 600, 700, 800, 900)
 @each $weight in $weights
   .fw-#{$weight}
-  font-weight: #{$weight} !important
+    font-weight: #{$weight} !important
 
 .fw-bold
   font-weight: bold !important
@@ -45,26 +45,26 @@ $weights: (100, 200, 300, 400, 500, 600, 700, 800, 900)
 $aligns: (left, center, right, justify)
 @each $align in $aligns
   .text-#{$align}
-  text-align: $align !important
+    text-align: $align !important
   .text-#{$align}-m
-  @include mobile
-    text-align: $align !important
+    @include mobile
+      text-align: $align !important
   .text-#{$align}-t
-  @include tablet
-    text-align: $align !important
+    @include tablet
+      text-align: $align !important
 
 // Text Transformation
 $transforms: (uppercase, lowercase, capitalize, none)
 @each $trans in $transforms
   .text-#{$trans}
-  text-transform: $trans !important
+    text-transform: $trans !important
 
 // Line Height
 @for $i from 1 through 4
   .lh-#{$i}
-  line-height: #{$i} !important
+    line-height: #{$i} !important
   .lh-#{$i}-5
-  line-height: #{$i + 0.5} !important
+    line-height: #{$i + 0.5} !important
 
 // White Space
 .ws-nowrap
