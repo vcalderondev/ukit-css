@@ -62,28 +62,15 @@ button
 // -----------------------------------------------------------------------------
 // Tiny helpers for clearing inherited backgrounds (commonly needed for
 // transparent overlays and reset buttons that ship in design systems).
+//
+// Both `.bg-transparent` and `.bg-none` set the same shorthand; the
+// difference is intent, not output.
 
-.bg-transparent
-  background: transparent !important
+$bg-resets: ("bg-transparent": transparent, "bg-none": none)
 
-.bg-transparent-m
-  @include mobile
-    background: transparent !important
-
-.bg-transparent-t
-  @include tablet
-    background: transparent !important
-
-.bg-none
-  background: none !important
-
-.bg-none-m
-  @include mobile
-    background: none !important
-
-.bg-none-t
-  @include tablet
-    background: none !important
+@each $class, $value in $bg-resets
+  @include responsive($class)
+    background: $value !important
 
 
 // -----------------------------------------------------------------------------
@@ -94,13 +81,5 @@ button
 // — each with `-m` / `-t` responsive variants.
 
 @each $cursor in $cursors
-  .cursor-#{$cursor}
+  @include responsive("cursor-#{$cursor}")
     cursor: $cursor !important
-
-  .cursor-#{$cursor}-m
-    @include mobile
-      cursor: $cursor !important
-
-  .cursor-#{$cursor}-t
-    @include tablet
-      cursor: $cursor !important

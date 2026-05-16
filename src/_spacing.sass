@@ -26,18 +26,6 @@
 @use 'variables' as *
 @use 'mixins' as *
 
-
-// -----------------------------------------------------------------------------
-// Numeric scales
-// -----------------------------------------------------------------------------
-// Each list controls which values get a generated class. Keep them sorted to
-// make new additions easy to review.
-
-$rem-values: (0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5)
-$px-values: (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 32, 35, 40, 45, 48, 50, 60, 64, 80, 100)
-$em-values: (1, 1.5, 2)
-
-
 // -----------------------------------------------------------------------------
 // generate-spacing
 // -----------------------------------------------------------------------------
@@ -150,10 +138,18 @@ $em-values: (1, 1.5, 2)
             #{$type}-#{$side}: #{$value}#{$unit} !important
 
 // -----------------------------------------------------------------------------
-// Generate utilities for all scales
+// Numeric scales -> generate classes
 // -----------------------------------------------------------------------------
-// `gap` is only emitted in the `px` scale, matching the historic behaviour of
-// this library.
+// Iterates over each value list and emits every padding / margin / gap
+// utility. Note that `$rem-values`, `$px-values` and `$em-values` are
+// declared in `_variables.sass`, while `$viewport-spacing` is local because
+// it's only used inside this module.
+//
+// All three properties (`padding`, `margin`, `gap`) are emitted for every
+// unit so consumers can use `.gap-1-rem`, `.gap-10px` or `.gap-1-em`
+// interchangeably.
+
+$viewport-spacing: (5, 10, 15, 20, 25, 30, 40, 50)
 
 @each $val in $rem-values
   @include generate-spacing("padding", $val, "rem")
@@ -170,7 +166,8 @@ $em-values: (1, 1.5, 2)
   @include generate-spacing("margin", $val, "em")
   @include generate-spacing("gap", $val, "em")
 
-$viewport-spacing: (5, 10, 15, 20, 25, 30, 40, 50)
+// Viewport-relative spacing (`vh` / `vw`). No `gap` variants because gap is
+// rarely sized to the viewport.
 @each $val in $viewport-spacing
   @include generate-spacing("padding", $val, "vh")
   @include generate-spacing("margin", $val, "vh")
@@ -181,89 +178,16 @@ $viewport-spacing: (5, 10, 15, 20, 25, 30, 40, 50)
 // -----------------------------------------------------------------------------
 // Auto margins
 // -----------------------------------------------------------------------------
-// Static helpers, not part of the generated scales. Each one ships with its
-// `-m` / `-t` responsive variant so layouts can flip behaviour per breakpoint
-// (e.g. `mx-auto` on desktop, `m-0` on mobile).
+// Iterates over a map of class-suffix -> list of CSS properties to set to
+// `auto`. The axis helpers (`mx-auto`, `my-auto`) target two properties at
+// once, so the map values are lists instead of single property names.
+//
+// Each entry generates `.{class}`, `.{class}-m` and `.{class}-t` via the
+// `responsive()` helper from `_mixins.sass`.
 
-.m-auto
-  margin: auto !important
+$auto-margins: ("m-auto": (margin), "mt-auto": (margin-top), "mb-auto": (margin-bottom), "ms-auto": (margin-left), "me-auto": (margin-right), "mx-auto": (margin-left, margin-right), "my-auto": (margin-top, margin-bottom))
 
-.m-auto-m
-  @include mobile
-    margin: auto !important
-
-.m-auto-t
-  @include tablet
-    margin: auto !important
-
-.mt-auto
-  margin-top: auto !important
-
-.mt-auto-m
-  @include mobile
-    margin-top: auto !important
-
-.mt-auto-t
-  @include tablet
-    margin-top: auto !important
-
-.mb-auto
-  margin-bottom: auto !important
-
-.mb-auto-m
-  @include mobile
-    margin-bottom: auto !important
-
-.mb-auto-t
-  @include tablet
-    margin-bottom: auto !important
-
-.ms-auto
-  margin-left: auto !important
-
-.ms-auto-m
-  @include mobile
-    margin-left: auto !important
-
-.ms-auto-t
-  @include tablet
-    margin-left: auto !important
-
-.me-auto
-  margin-right: auto !important
-
-.me-auto-m
-  @include mobile
-    margin-right: auto !important
-
-.me-auto-t
-  @include tablet
-    margin-right: auto !important
-
-.mx-auto
-  margin-left: auto !important
-  margin-right: auto !important
-
-.mx-auto-m
-  @include mobile
-    margin-left: auto !important
-    margin-right: auto !important
-
-.mx-auto-t
-  @include tablet
-    margin-left: auto !important
-    margin-right: auto !important
-
-.my-auto
-  margin-top: auto !important
-  margin-bottom: auto !important
-
-.my-auto-m
-  @include mobile
-    margin-top: auto !important
-    margin-bottom: auto !important
-
-.my-auto-t
-  @include tablet
-    margin-top: auto !important
-    margin-bottom: auto !important
+@each $class, $props in $auto-margins
+  @include responsive($class)
+    @each $prop in $props
+      #{$prop}: auto !important

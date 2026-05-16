@@ -91,81 +91,42 @@ $fs-em-values: (1, 1.2, 1.5, 2)
 // -----------------------------------------------------------------------------
 // Font weight
 // -----------------------------------------------------------------------------
-// Numeric weights from 100 to 900 plus the `bold` and `normal` keywords.
+// Numeric weights from 100 to 900 and the `bold` / `normal` keywords are
+// emitted from a single map: the key becomes the class suffix
+// (`.fw-100`, `.fw-bold`) and the value becomes the CSS value. Every entry
+// also gets `-m` and `-t` responsive variants through the `responsive()`
+// helper.
 
-$weights: (100, 200, 300, 400, 500, 600, 700, 800, 900)
+$weights: ("100": 100, "200": 200, "300": 300, "400": 400, "500": 500, "600": 600, "700": 700, "800": 800, "900": 900, "bold": bold, "normal": normal)
 
-@each $weight in $weights
-  .fw-#{$weight}
-    font-weight: #{$weight} !important
-
-  .fw-#{$weight}-m
-    @include mobile
-      font-weight: #{$weight} !important
-
-  .fw-#{$weight}-t
-    @include tablet
-      font-weight: #{$weight} !important
-
-.fw-bold
-  font-weight: bold !important
-
-.fw-bold-m
-  @include mobile
-    font-weight: bold !important
-
-.fw-bold-t
-  @include tablet
-    font-weight: bold !important
-
-.fw-normal
-  font-weight: normal !important
-
-.fw-normal-m
-  @include mobile
-    font-weight: normal !important
-
-.fw-normal-t
-  @include tablet
-    font-weight: normal !important
+@each $name, $value in $weights
+  @include responsive("fw-#{$name}")
+    font-weight: $value !important
 
 
 // -----------------------------------------------------------------------------
 // Text alignment
 // -----------------------------------------------------------------------------
+// `.text-left`, `.text-center`, `.text-right`, `.text-justify` + responsive.
 
 $aligns: (left, center, right, justify)
 
 @each $align in $aligns
-  .text-#{$align}
+  @include responsive("text-#{$align}")
     text-align: $align !important
-
-  .text-#{$align}-m
-    @include mobile
-      text-align: $align !important
-
-  .text-#{$align}-t
-    @include tablet
-      text-align: $align !important
 
 
 // -----------------------------------------------------------------------------
 // Text transformation
 // -----------------------------------------------------------------------------
+// `.text-uppercase`, `.text-lowercase`, `.text-capitalize`, `.text-none`
+// + responsive.
 
 $transforms: (uppercase, lowercase, capitalize, none)
 
 @each $trans in $transforms
-  .text-#{$trans}
+  @include responsive("text-#{$trans}")
     text-transform: $trans !important
-
-  .text-#{$trans}-m
-    @include mobile
-      text-transform: $trans !important
-
-  .text-#{$trans}-t
-    @include tablet
-      text-transform: $trans !important
 
 
 // -----------------------------------------------------------------------------
@@ -174,88 +135,35 @@ $transforms: (uppercase, lowercase, capitalize, none)
 // Whole values (`.lh-1` .. `.lh-4`) and half steps (`.lh-1-5` .. `.lh-4-5`).
 
 @for $i from 1 through 4
-  .lh-#{$i}
+  @include responsive("lh-#{$i}")
     line-height: #{$i} !important
 
-  .lh-#{$i}-m
-    @include mobile
-      line-height: #{$i} !important
-
-  .lh-#{$i}-t
-    @include tablet
-      line-height: #{$i} !important
-
-  .lh-#{$i}-5
+  @include responsive("lh-#{$i}-5")
     line-height: #{$i + 0.5} !important
-
-  .lh-#{$i}-5-m
-    @include mobile
-      line-height: #{$i + 0.5} !important
-
-  .lh-#{$i}-5-t
-    @include tablet
-      line-height: #{$i + 0.5} !important
 
 
 // -----------------------------------------------------------------------------
 // White space
 // -----------------------------------------------------------------------------
+// `.ws-nowrap`, `.ws-normal`, `.ws-pre` + responsive variants.
 
-.ws-nowrap
-  white-space: nowrap !important
+$white-spaces: (nowrap, normal, pre)
 
-.ws-nowrap-m
-  @include mobile
-    white-space: nowrap !important
-
-.ws-nowrap-t
-  @include tablet
-    white-space: nowrap !important
-
-.ws-normal
-  white-space: normal !important
-
-.ws-normal-m
-  @include mobile
-    white-space: normal !important
-
-.ws-normal-t
-  @include tablet
-    white-space: normal !important
-
-.ws-pre
-  white-space: pre !important
-
-.ws-pre-m
-  @include mobile
-    white-space: pre !important
-
-.ws-pre-t
-  @include tablet
-    white-space: pre !important
+@each $ws in $white-spaces
+  @include responsive("ws-#{$ws}")
+    white-space: $ws !important
 
 
 // -----------------------------------------------------------------------------
 // Text overflow
 // -----------------------------------------------------------------------------
-// Standard "single-line ellipsis" combination.
+// Standard "single-line ellipsis" combo: hide overflow + emit `…` glyph +
+// stay on one line. The three declarations always go together.
 
-.text-ellipsis
+@include responsive("text-ellipsis")
   overflow: hidden !important
   text-overflow: ellipsis !important
   white-space: nowrap !important
-
-.text-ellipsis-m
-  @include mobile
-    overflow: hidden !important
-    text-overflow: ellipsis !important
-    white-space: nowrap !important
-
-.text-ellipsis-t
-  @include tablet
-    overflow: hidden !important
-    text-overflow: ellipsis !important
-    white-space: nowrap !important
 
 
 // -----------------------------------------------------------------------------

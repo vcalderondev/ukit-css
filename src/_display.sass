@@ -15,6 +15,7 @@
 // =============================================================================
 
 @use 'sass:map'
+@use 'sass:list'
 @use 'variables' as *
 @use 'mixins' as *
 
@@ -26,19 +27,14 @@
 // `.d-{value}-m` and `.d-{value}-t` for every entry in `$displays`.
 
 @each $display in $displays
-  .d-#{$display}
+  // `.d-{value}` + `.d-{value}-m` + `.d-{value}-t` from a single declaration.
+  @include responsive("d-#{$display}")
     display: $display !important
 
+  // `.d-{value}-i` is a redundant explicit-!important alias kept for
+  // historical reasons — same output as the base class.
   .d-#{$display}-i
     display: $display !important
-
-  .d-#{$display}-m
-    @include mobile
-      display: $display !important
-
-  .d-#{$display}-t
-    @include tablet
-      display: $display !important
 
 
 // -----------------------------------------------------------------------------
@@ -47,35 +43,17 @@
 // Iterates the `$sizes` list (0, 5, 10, ..., 100) and creates the matching
 // `.w-*` / `.h-*` classes plus their `-m` and `-t` responsive variants.
 
+// Note: percentage values are built with `$size * 1%` (not the interpolated
+// form `#{$size}%`). The interpolated form clashes with Sass' modulo
+// operator (`%`) in indented syntax and breaks parsing on strict Dart Sass
+// builds.
+
 @each $size in $sizes
-  // Note: we build the percentage value with `$size * 1%` instead of the
-  // string-interpolated form `#{$size}%`. The interpolated form clashes with
-  // Sass' modulo operator (`%`) in indented syntax and breaks parsing on
-  // strict Dart Sass builds.
+  @include responsive("w-#{$size}")
+    width: $size * 1% !important
 
-  // Width
-  .w-#{$size}
-    width: $size * 1%
-
-  .w-#{$size}-m
-    @include mobile
-      width: $size * 1% !important
-
-  .w-#{$size}-t
-    @include tablet
-      width: $size * 1% !important
-
-  // Height
-  .h-#{$size}
-    height: $size * 1%
-
-  .h-#{$size}-m
-    @include mobile
-      height: $size * 1% !important
-
-  .h-#{$size}-t
-    @include tablet
-      height: $size * 1% !important
+  @include responsive("h-#{$size}")
+    height: $size * 1% !important
 
 
 // -----------------------------------------------------------------------------
@@ -85,114 +63,41 @@
 $viewport-sizes: (10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95, 100)
 
 @each $vsize in $viewport-sizes
-  .w-#{$vsize}vw
+  @include responsive("w-#{$vsize}vw")
     width: #{$vsize}vw !important
-  .w-#{$vsize}vw-m
-    @include mobile
-      width: #{$vsize}vw !important
-  .w-#{$vsize}vw-t
-    @include tablet
-      width: #{$vsize}vw !important
 
-  .h-#{$vsize}vh
+  @include responsive("h-#{$vsize}vh")
     height: #{$vsize}vh !important
-  .h-#{$vsize}vh-m
-    @include mobile
-      height: #{$vsize}vh !important
-  .h-#{$vsize}vh-t
-    @include tablet
-      height: #{$vsize}vh !important
 
 
 // -----------------------------------------------------------------------------
-// Content-driven and viewport-relative sizes
+// Content-driven and full-viewport shortcuts
 // -----------------------------------------------------------------------------
+// Iterates a small map of { class-suffix: (property, value) } pairs and uses
+// the `responsive()` helper to emit base + `-m` + `-t` variants.
 
-.w-max-content
-  width: max-content
+$shortcut-sizes: ("w-max-content": (width, max-content), "w-100vw": (width, 100vw), "h-100vh": (height, 100vh))
 
-.w-max-content-m
-  @include mobile
-    width: max-content !important
-
-.w-max-content-t
-  @include tablet
-    width: max-content !important
-
-.w-100vw
-  width: 100vw
-
-.w-100vw-m
-  @include mobile
-    width: 100vw !important
-
-.w-100vw-t
-  @include tablet
-    width: 100vw !important
-
-.h-100vh
-  height: 100vh
-
-.h-100vh-m
-  @include mobile
-    height: 100vh !important
-
-.h-100vh-t
-  @include tablet
-    height: 100vh !important
+@each $name, $pair in $shortcut-sizes
+  $prop: list.nth($pair, 1)
+  $val: list.nth($pair, 2)
+  @include responsive($name)
+    #{$prop}: $val !important
 
 
 // -----------------------------------------------------------------------------
 // Fixed Sizing (px)
 // -----------------------------------------------------------------------------
-// Generates .w-Xpx, .h-Xpx and .max-w-Xpx for values from 1 to 64.
-// Useful for fixed-size elements like headers, icons and buttons.
+// Generates `.w-Xpx`, `.h-Xpx`, `.max-w-Xpx`, `.min-w-Xpx`, `.min-h-Xpx` for
+// every value in the chosen scale. Useful for fixed-size headers, icons and
+// buttons.
+
+$fixed-size-props: ("w": width, "h": height, "max-w": max-width, "min-w": min-width, "min-h": min-height)
 
 @mixin generate-fixed-size($i)
-  .w-#{$i}px
-    width: #{$i}px !important
-  .w-#{$i}px-m
-    @include mobile
-      width: #{$i}px !important
-  .w-#{$i}px-t
-    @include tablet
-      width: #{$i}px !important
-
-  .h-#{$i}px
-    height: #{$i}px !important
-  .h-#{$i}px-m
-    @include mobile
-      height: #{$i}px !important
-  .h-#{$i}px-t
-    @include tablet
-      height: #{$i}px !important
-
-  .max-w-#{$i}px
-    max-width: #{$i}px !important
-  .max-w-#{$i}px-m
-    @include mobile
-      max-width: #{$i}px !important
-  .max-w-#{$i}px-t
-    @include tablet
-      max-width: #{$i}px !important
-
-  .min-w-#{$i}px
-    min-width: #{$i}px !important
-  .min-w-#{$i}px-m
-    @include mobile
-      min-width: #{$i}px !important
-  .min-w-#{$i}px-t
-    @include tablet
-      min-width: #{$i}px !important
-
-  .min-h-#{$i}px
-    min-height: #{$i}px !important
-  .min-h-#{$i}px-m
-    @include mobile
-      min-height: #{$i}px !important
-  .min-h-#{$i}px-t
-    @include tablet
-      min-height: #{$i}px !important
+  @each $prefix, $prop in $fixed-size-props
+    @include responsive("#{$prefix}-#{$i}px")
+      #{$prop}: #{$i}px !important
 
 @for $i from 1 through 64
   @include generate-fixed-size($i)
@@ -240,16 +145,8 @@ $cursors: (pointer, default, move, not-allowed, help, wait, text)
 // `.position-sticky` together with their responsive variants.
 
 @each $pos in $positions
-  .position-#{$pos}
+  @include responsive("position-#{$pos}")
     position: $pos !important
-
-  .position-#{$pos}-m
-    @include mobile
-      position: $pos
-
-  .position-#{$pos}-t
-    @include tablet
-      position: $pos
 
 
 // -----------------------------------------------------------------------------
@@ -259,49 +156,29 @@ $cursors: (pointer, default, move, not-allowed, help, wait, text)
 // so consumers can write `.align-items-start` instead of
 // `.align-items-flex-start`.
 
+// Properties that share the same value vocabulary. Keeping them in a list
+// avoids three near-identical loops further down.
+$align-props: (align-items, align-self, align-content)
+
 @each $align in $alignments
+  // Shorten the class suffix: `.align-items-start` reads better than
+  // `.align-items-flex-start`.
   $suffix: $align
   @if $align == 'flex-start'
     $suffix: 'start'
   @else if $align == 'flex-end'
     $suffix: 'end'
 
-  .align-items-#{$suffix}
-    align-items: #{$align} !important
-  
-  @if $suffix != $align
-    .align-items-#{$align}
-      align-items: #{$align}
+  @each $prop in $align-props
+    @include responsive("#{$prop}-#{$suffix}")
+      #{$prop}: $align !important
 
-  .align-items-#{$suffix}-m
-    @include mobile
-      align-items: #{$align} !important
-
-  .align-items-#{$suffix}-t
-    @include tablet
-      align-items: #{$align} !important
-
-  .align-self-#{$suffix}
-    align-self: #{$align}
-
-  .align-self-#{$suffix}-m
-    @include mobile
-      align-self: #{$align} !important
-
-  .align-self-#{$suffix}-t
-    @include tablet
-      align-self: #{$align} !important
-
-  .align-content-#{$suffix}
-    align-content: #{$align}
-
-  .align-content-#{$suffix}-m
-    @include mobile
-      align-content: #{$align} !important
-
-  .align-content-#{$suffix}-t
-    @include tablet
-      align-content: #{$align} !important
+    // When we aliased the suffix, also emit the long-form class as a
+    // non-responsive alias so consumers using `.align-items-flex-start`
+    // keep working.
+    @if $suffix != $align
+      .#{$prop}-#{$align}
+        #{$prop}: $align !important
 
 
 // -----------------------------------------------------------------------------
@@ -309,7 +186,12 @@ $cursors: (pointer, default, move, not-allowed, help, wait, text)
 // -----------------------------------------------------------------------------
 // Same `flex-start` / `flex-end` aliasing rule as the alignment block above.
 
+// Same pattern as the alignment block above: three CSS properties share the
+// same value vocabulary.
+$justify-props: (justify-content, justify-items, justify-self)
+
 @each $just in $justifications
+  // Map verbose keywords to short suffixes (`space-between` -> `between`, ...).
   $suffix: $just
   @if $just == 'flex-start'
     $suffix: 'start'
@@ -322,88 +204,35 @@ $cursors: (pointer, default, move, not-allowed, help, wait, text)
   @else if $just == 'space-evenly'
     $suffix: 'evenly'
 
-  .justify-content-#{$suffix}
-    justify-content: #{$just} !important
+  @each $prop in $justify-props
+    @include responsive("#{$prop}-#{$suffix}")
+      #{$prop}: $just !important
 
-  .justify-content-#{$suffix}-m
-    @include mobile
-      justify-content: #{$just} !important
-
-  .justify-content-#{$suffix}-t
-    @include tablet
-      justify-content: #{$just} !important
-
-  .justify-items-#{$suffix}
-    justify-items: #{$just}
-
-  .justify-items-#{$suffix}-m
-    @include mobile
-      justify-items: #{$just} !important
-
-  .justify-items-#{$suffix}-t
-    @include tablet
-      justify-items: #{$just} !important
-
-  .justify-self-#{$suffix}
-    justify-self: #{$just}
-
-  .justify-self-#{$suffix}-m
-    @include mobile
-      justify-self: #{$just} !important
-
-  .justify-self-#{$suffix}-t
-    @include tablet
-      justify-self: #{$just} !important
+    // Preserve the long-form class as a non-responsive alias.
+    @if $suffix != $just
+      .#{$prop}-#{$just}
+        #{$prop}: $just !important
 
 
 // -----------------------------------------------------------------------------
 // Flex helpers: flex / flex-grow / flex-shrink / flex-none
 // -----------------------------------------------------------------------------
+// `.flex-0` / `.flex-1` and the matching grow / shrink helpers are emitted in
+// one pass. `.flex-none` is special because its value is the keyword `none`
+// instead of a number.
 
 @for $i from 0 through 1
-  .flex-#{$i}
-    flex: $i
+  @include responsive("flex-#{$i}")
+    flex: $i !important
 
-  .flex-#{$i}-m
-    @include mobile
-      flex: $i !important
+  @include responsive("flex-grow-#{$i}")
+    flex-grow: $i !important
 
-  .flex-#{$i}-t
-    @include tablet
-      flex: $i !important
+  @include responsive("flex-shrink-#{$i}")
+    flex-shrink: $i !important
 
-  .flex-grow-#{$i}
-    flex-grow: $i
-
-  .flex-grow-#{$i}-m
-    @include mobile
-      flex-grow: $i !important
-
-  .flex-grow-#{$i}-t
-    @include tablet
-      flex-grow: $i !important
-
-  .flex-shrink-#{$i}
-    flex-shrink: $i
-
-  .flex-shrink-#{$i}-m
-    @include mobile
-      flex-shrink: $i !important
-
-  .flex-shrink-#{$i}-t
-    @include tablet
-      flex-shrink: $i !important
-
-.flex-none
-  flex: none
-
-.flex-none-m
-  @include mobile
-    flex: none !important
-
-.flex-none-t
-  @include tablet
-    flex: none !important
+@include responsive("flex-none")
+  flex: none !important
 
 
 // -----------------------------------------------------------------------------
@@ -411,55 +240,23 @@ $cursors: (pointer, default, move, not-allowed, help, wait, text)
 // -----------------------------------------------------------------------------
 
 @each $wrap in $flex-wraps
-  .flex-#{$wrap}
-    flex-wrap: $wrap
-
-  .flex-#{$wrap}-m
-    @include mobile
-      flex-wrap: $wrap !important
-
-  .flex-#{$wrap}-t
-    @include tablet
-      flex-wrap: $wrap !important
+  @include responsive("flex-#{$wrap}")
+    flex-wrap: $wrap !important
 
 @each $dir in $flex-directions
-  .flex-direction-#{$dir}
+  @include responsive("flex-direction-#{$dir}")
     flex-direction: #{$dir} !important
-
-  .flex-direction-#{$dir}-m
-    @include mobile
-      flex-direction: #{$dir} !important
-
-  .flex-direction-#{$dir}-t
-    @include tablet
-      flex-direction: #{$dir} !important
 
 
 // -----------------------------------------------------------------------------
 // Object fit
 // -----------------------------------------------------------------------------
 
-.object-cover
-  object-fit: cover
+$object-fits: (cover, contain)
 
-.object-cover-m
-  @include mobile
-    object-fit: cover !important
-
-.object-cover-t
-  @include tablet
-    object-fit: cover !important
-
-.object-contain
-  object-fit: contain
-
-.object-contain-m
-  @include mobile
-    object-fit: contain !important
-
-.object-contain-t
-  @include tablet
-    object-fit: contain !important
+@each $fit in $object-fits
+  @include responsive("object-#{$fit}")
+    object-fit: $fit !important
 
 
 // -----------------------------------------------------------------------------
@@ -470,73 +267,38 @@ $cursors: (pointer, default, move, not-allowed, help, wait, text)
 //   - Decades:       .z-10, .z-20, ..., .z-100
 
 @for $i from 1 through 10
-  .z-#{$i}
-    z-index: $i
+  // Units: .z-1 ... .z-10
+  @include responsive("z-#{$i}")
+    z-index: $i !important
 
-  .z-#{$i}-m
-    @include mobile
-      z-index: $i !important
+  // Decades: .z-10, .z-20, ..., .z-100 (`.z-10` is emitted twice — once here
+  // and once in the units loop above. Both declarations are identical, so
+  // browsers de-duplicate transparently.)
+  @include responsive("z-#{$i * 10}")
+    z-index: $i * 10 !important
 
-  .z-#{$i}-t
-    @include tablet
-      z-index: $i !important
-
-  .z-#{$i * 10}
-    z-index: $i * 10
-
-  .z-#{$i * 10}-m
-    @include mobile
-      z-index: $i * 10 !important
-
-  .z-#{$i * 10}-t
-    @include tablet
-      z-index: $i * 10 !important
-
+// Extreme z-indexes used by modals, toasts and overlay stacks that must
+// beat anything else on the page.
 $extreme-z: (500, 1000, 2000, 5000, 9999, 10000)
+
 @each $z in $extreme-z
-  .z-#{$z}
+  @include responsive("z-#{$z}")
     z-index: $z !important
-
-  .z-#{$z}-m
-    @include mobile
-      z-index: $z !important
-
-  .z-#{$z}-t
-    @include tablet
-      z-index: $z !important
 
 
 // -----------------------------------------------------------------------------
 // Overflow
 // -----------------------------------------------------------------------------
+// For every `$overflows` keyword we emit three property variants:
+// `overflow` (both axes), `overflow-x`, `overflow-y`. The map keeps the
+// class-prefix -> CSS-property mapping so the loop stays a single block.
+
+$overflow-props: ("overflow": overflow, "overflow-x": overflow-x, "overflow-y": overflow-y)
 
 @each $overflow in $overflows
-  .overflow-#{$overflow}
-    overflow: $overflow !important
-  .overflow-#{$overflow}-m
-    @include mobile
-      overflow: $overflow !important
-  .overflow-#{$overflow}-t
-    @include tablet
-      overflow: $overflow !important
-
-  .overflow-x-#{$overflow}
-    overflow-x: $overflow !important
-  .overflow-x-#{$overflow}-m
-    @include mobile
-      overflow-x: $overflow !important
-  .overflow-x-#{$overflow}-t
-    @include tablet
-      overflow-x: $overflow !important
-
-  .overflow-y-#{$overflow}
-    overflow-y: $overflow !important
-  .overflow-y-#{$overflow}-m
-    @include mobile
-      overflow-y: $overflow !important
-  .overflow-y-#{$overflow}-t
-    @include tablet
-      overflow-y: $overflow !important
+  @each $prefix, $prop in $overflow-props
+    @include responsive("#{$prefix}-#{$overflow}")
+      #{$prop}: $overflow !important
 
 
 // -----------------------------------------------------------------------------
@@ -546,13 +308,5 @@ $extreme-z: (500, 1000, 2000, 5000, 9999, 10000)
 // emit the corresponding decimal value (e.g. `.opacity-50` -> `opacity: 0.5`).
 
 @each $opacity in $opacities
-  .opacity-#{$opacity}
+  @include responsive("opacity-#{$opacity}")
     opacity: $opacity * 0.01 !important
-
-  .opacity-#{$opacity}-m
-    @include mobile
-      opacity: $opacity * 0.01 !important
-
-  .opacity-#{$opacity}-t
-    @include tablet
-      opacity: $opacity * 0.01 !important

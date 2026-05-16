@@ -13,118 +13,64 @@
 @use 'mixins' as *
 
 
+$sides: (top, bottom, left, right, start, end)
+
+
 // -----------------------------------------------------------------------------
-// Zero / 50% offsets
+// Edge offsets (0 & 50%)
 // -----------------------------------------------------------------------------
 // Anchored helpers for the four edges. The `-50-percent` variants are most
 // often combined with `.translate-center` / `.translate-x-center` /
 // `.translate-y-center` to perform absolute centering.
 
-.top-0
-  top: 0 !important
+$offsets: ("0": 0, "50-percent": 50%)
 
-.top-0-m
-  @include mobile
-    top: 0 !important
+@each $side in $sides
+  @each $name, $value in $offsets
+    .#{$side}-#{$name}
+      #{$side}: $value !important
 
-.top-0-t
-  @include tablet
-    top: 0 !important
+    .#{$side}-#{$name}-m
+      @include mobile
+        #{$side}: $value !important
 
-.top-50-percent
-  top: 50%
-
-.top-50-percent-m
-  @include mobile
-    top: 50% !important
-
-.top-50-percent-t
-  @include tablet
-    top: 50% !important
-
-.bottom-0
-  bottom: 0 !important
-
-.bottom-0-m
-  @include mobile
-    bottom: 0 !important
-
-.bottom-0-t
-  @include tablet
-    bottom: 0 !important
-
-.left-0
-  left: 0 !important
-
-.left-0-m
-  @include mobile
-    left: 0 !important
-
-.left-0-t
-  @include tablet
-    left: 0 !important
-
-.left-50-percent
-  left: 50%
-
-.left-50-percent-m
-  @include mobile
-    left: 50% !important
-
-.left-50-percent-t
-  @include tablet
-    left: 50% !important
-
-.right-0
-  right: 0 !important
-
-.right-0-m
-  @include mobile
-    right: 0 !important
-
-.right-0-t
-  @include tablet
-    right: 0 !important
+    .#{$side}-#{$name}-t
+      @include tablet
+        #{$side}: $value !important
 
 
 // -----------------------------------------------------------------------------
-// Pixel-based bottom offsets
+// Numeric offsets (px & rem)
 // -----------------------------------------------------------------------------
-// Commonly used for floating action buttons, toasts and badges.
+// Comprehensive scales for precise positioning on all four edges.
 
-$bottom-px-values: (16, 32, 40)
+@each $side in $sides
+  // Pixel-based offsets: .top-10px, .bottom-24px, ...
+  @each $value in $px-values
+    .#{$side}-#{$value}px
+      #{$side}: #{$value}px !important
 
-@each $value in $bottom-px-values
-  .bottom-#{$value}px
-    bottom: #{$value}px
+    .#{$side}-#{$value}px-m
+      @include mobile
+        #{$side}: #{$value}px !important
 
-  .bottom-#{$value}px-m
-    @include mobile
-      bottom: #{$value}px !important
+    .#{$side}-#{$value}px-t
+      @include tablet
+        #{$side}: #{$value}px !important
 
-  .bottom-#{$value}px-t
-    @include tablet
-      bottom: #{$value}px !important
+  // Rem-based offsets: .left-1-rem, .right-0-5-rem, ...
+  @each $value in $rem-values
+    $val-str: str-replace("#{$value}", ".", "-")
+    .#{$side}-#{$val-str}-rem
+      #{$side}: #{$value}rem !important
 
+    .#{$side}-#{$val-str}-rem-m
+      @include mobile
+        #{$side}: #{$value}rem !important
 
-// -----------------------------------------------------------------------------
-// Pixel-based right offsets
-// -----------------------------------------------------------------------------
-// Used for absolutely positioned controls (close buttons, icons, ...).
-
-$right-px-values: (4, 6, 8, 12)
-
-@each $value in $right-px-values
-  .right-#{$value}px
-    right: #{$value}px
-
-  .right-#{$value}px-m
-    @include mobile
-      right: #{$value}px !important
-
-  .right-#{$value}px-t
-    @include tablet
-      right: #{$value}px !important
+    .#{$side}-#{$val-str}-rem-t
+      @include tablet
+        #{$side}: #{$value}rem !important
 
 
 // -----------------------------------------------------------------------------
@@ -134,83 +80,16 @@ $right-px-values: (4, 6, 8, 12)
 // `.position-absolute` and the `*-50-percent` offsets above to center
 // children around a coordinate.
 
-// `.translate-x-center` / `.translate-y-center` are the canonical names.
-// `.translate-x-neg-50` / `.translate-y-neg-50` are explicit aliases that
-// document the underlying value (-50%) for consumers who prefer that style.
+$transform-utils: ("translate-x-center": translateX(-50%), "translate-x-neg-50": translateX(-50%), "translate-y-center": translateY(-50%), "translate-y-neg-50": translateY(-50%), "translate-center": translate(-50%, -50%), "transform-none": none, "rotate-90": rotate(90deg))
 
-.translate-x-center
-  transform: translateX(-50%)
+@each $name, $value in $transform-utils
+  .#{$name}
+    transform: $value !important
 
-.translate-x-center-m
-  @include mobile
-    transform: translateX(-50%) !important
+  .#{$name}-m
+    @include mobile
+      transform: $value !important
 
-.translate-x-center-t
-  @include tablet
-    transform: translateX(-50%) !important
-
-.translate-x-neg-50
-  transform: translateX(-50%) !important
-
-.translate-x-neg-50-m
-  @include mobile
-    transform: translateX(-50%) !important
-
-.translate-x-neg-50-t
-  @include tablet
-    transform: translateX(-50%) !important
-
-.translate-y-center
-  transform: translateY(-50%)
-
-.translate-y-center-m
-  @include mobile
-    transform: translateY(-50%) !important
-
-.translate-y-center-t
-  @include tablet
-    transform: translateY(-50%) !important
-
-.translate-y-neg-50
-  transform: translateY(-50%) !important
-
-.translate-y-neg-50-m
-  @include mobile
-    transform: translateY(-50%) !important
-
-.translate-y-neg-50-t
-  @include tablet
-    transform: translateY(-50%) !important
-
-.translate-center
-  transform: translate(-50%, -50%)
-
-.translate-center-m
-  @include mobile
-    transform: translate(-50%, -50%) !important
-
-.translate-center-t
-  @include tablet
-    transform: translate(-50%, -50%) !important
-
-.transform-none
-  transform: none
-
-.transform-none-m
-  @include mobile
-    transform: none !important
-
-.transform-none-t
-  @include tablet
-    transform: none !important
-
-.rotate-90
-  transform: rotate(90deg)
-
-.rotate-90-m
-  @include mobile
-    transform: rotate(90deg) !important
-
-.rotate-90-t
-  @include tablet
-    transform: rotate(90deg) !important
+  .#{$name}-t
+    @include tablet
+      transform: $value !important

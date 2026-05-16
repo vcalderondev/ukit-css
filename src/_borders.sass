@@ -26,112 +26,49 @@
 //
 // All variants also get `-m` and `-t` responsive forms.
 
+// Class-prefix aliases. Every radius helper is emitted twice: once as the
+// long-form `.border-radius-*` and once as the short alias `.rounded-*`.
+$radius-prefixes: ("border-radius", "rounded")
+
+// Maps the side suffix (`t`, `b`, `l`, `r`) to the pair of physical corners
+// it affects. Used to build `.rounded-t-Npx`, `.rounded-b-Npx`, etc.
+$radius-sides: ("t": (top-left, top-right), "b": (bottom-left, bottom-right), "l": (top-left, bottom-left), "r": (top-right, bottom-right))
+
 @each $radius in $border-radius-px
-  // Full radius
-  .border-radius-#{$radius}px, .rounded-#{$radius}px
-    border-radius: #{$radius}px !important
-
-  .border-radius-#{$radius}px-m, .rounded-#{$radius}px-m
-    @include mobile
+  // Full radius: `.border-radius-Npx`, `.rounded-Npx`
+  @each $prefix in $radius-prefixes
+    @include responsive("#{$prefix}-#{$radius}px")
       border-radius: #{$radius}px !important
 
-  .border-radius-#{$radius}px-t, .rounded-#{$radius}px-t
-    @include tablet
-      border-radius: #{$radius}px !important
-
-  // Top corners only
-  .border-radius-t-#{$radius}px, .rounded-t-#{$radius}px
-    border-top-left-radius: #{$radius}px !important
-    border-top-right-radius: #{$radius}px !important
-
-  .border-radius-t-#{$radius}px-m, .rounded-t-#{$radius}px-m
-    @include mobile
-      border-top-left-radius: #{$radius}px !important
-      border-top-right-radius: #{$radius}px !important
-
-  .border-radius-t-#{$radius}px-t, .rounded-t-#{$radius}px-t
-    @include tablet
-      border-top-left-radius: #{$radius}px !important
-      border-top-right-radius: #{$radius}px !important
-
-  // Bottom corners only
-  .border-radius-b-#{$radius}px, .rounded-b-#{$radius}px
-    border-bottom-left-radius: #{$radius}px !important
-    border-bottom-right-radius: #{$radius}px !important
-
-  .border-radius-b-#{$radius}px-m, .rounded-b-#{$radius}px-m
-    @include mobile
-      border-bottom-left-radius: #{$radius}px !important
-      border-bottom-right-radius: #{$radius}px !important
-
-  .border-radius-b-#{$radius}px-t, .rounded-b-#{$radius}px-t
-    @include tablet
-      border-bottom-left-radius: #{$radius}px !important
-      border-bottom-right-radius: #{$radius}px !important
-
-  // Left corners only
-  .border-radius-l-#{$radius}px, .rounded-l-#{$radius}px
-    border-top-left-radius: #{$radius}px !important
-    border-bottom-left-radius: #{$radius}px !important
-
-  .border-radius-l-#{$radius}px-m, .rounded-l-#{$radius}px-m
-    @include mobile
-      border-top-left-radius: #{$radius}px !important
-      border-bottom-left-radius: #{$radius}px !important
-
-  .border-radius-l-#{$radius}px-t, .rounded-l-#{$radius}px-t
-    @include tablet
-      border-top-left-radius: #{$radius}px !important
-      border-bottom-left-radius: #{$radius}px !important
-
-  // Right corners only
-  .border-radius-r-#{$radius}px, .rounded-r-#{$radius}px
-    border-top-right-radius: #{$radius}px !important
-    border-bottom-right-radius: #{$radius}px !important
-
-  .border-radius-r-#{$radius}px-m, .rounded-r-#{$radius}px-m
-    @include mobile
-      border-top-right-radius: #{$radius}px !important
-      border-bottom-right-radius: #{$radius}px !important
-
-  .border-radius-r-#{$radius}px-t, .rounded-r-#{$radius}px-t
-    @include tablet
-      border-top-right-radius: #{$radius}px !important
-      border-bottom-right-radius: #{$radius}px !important
+  // Directional radii: `.rounded-t-Npx`, `.rounded-b-Npx`, etc.
+  @each $suffix, $corners in $radius-sides
+    @each $prefix in $radius-prefixes
+      @include responsive("#{$prefix}-#{$suffix}-#{$radius}px")
+        @each $corner in $corners
+          border-#{$corner}-radius: #{$radius}px !important
 
 
 // -----------------------------------------------------------------------------
 // Border Radius (named / theme tokens)
 // -----------------------------------------------------------------------------
 // Named radii (`xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `full`) defined in
-// `$border-radius-named` in `_variables.sass`.
+// `$border-radius-named` in `_variables.sass`. Each token gets both the
+// `.border-radius-NAME` long form and the `.rounded-NAME` alias.
 
 @each $name, $value in $border-radius-named
-  .border-radius-#{$name}, .rounded-#{$name}
-    border-radius: $value !important
-
-  .border-radius-#{$name}-m, .rounded-#{$name}-m
-    @include mobile
-      border-radius: $value !important
-
-  .border-radius-#{$name}-t, .rounded-#{$name}-t
-    @include tablet
+  @each $prefix in $radius-prefixes
+    @include responsive("#{$prefix}-#{$name}")
       border-radius: $value !important
 
 
 // -----------------------------------------------------------------------------
 // Special case: 50% (circular elements)
 // -----------------------------------------------------------------------------
+// `.border-radius-50-percent` and `.rounded-50-percent` are emitted in a
+// single loop reusing `$radius-prefixes`.
 
-.border-radius-50-percent, .rounded-50-percent
-  border-radius: 50% !important
-
-.border-radius-50-percent-m, .rounded-50-percent-m
-  @include mobile
-    border-radius: 50% !important
-
-.border-radius-50-percent-t, .rounded-50-percent-t
-  @include tablet
+@each $prefix in $radius-prefixes
+  @include responsive("#{$prefix}-50-percent")
     border-radius: 50% !important
 
 
@@ -173,28 +110,14 @@
 // -----------------------------------------------------------------------------
 // Border styles (clearing borders)
 // -----------------------------------------------------------------------------
+// `.border-none` clears the whole border shorthand; `.border-transparent`
+// keeps the box width but makes the line invisible.
 
-.border-none
+@include responsive("border-none")
   border: none !important
 
-.border-none-m
-  @include mobile
-    border: none !important
-
-.border-none-t
-  @include tablet
-    border: none !important
-
-.border-transparent
+@include responsive("border-transparent")
   border-color: transparent !important
-
-.border-transparent-m
-  @include mobile
-    border-color: transparent !important
-
-.border-transparent-t
-  @include tablet
-    border-color: transparent !important
 
 
 // -----------------------------------------------------------------------------

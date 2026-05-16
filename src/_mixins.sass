@@ -68,3 +68,33 @@
   @else if $point == desktop
     @include desktop
       @content
+
+
+// -----------------------------------------------------------------------------
+// responsive($selector)
+// -----------------------------------------------------------------------------
+// DRY helper that emits a base class plus its `-m` and `-t` responsive
+// variants from a single `@content` block. Avoids the typical 3x repetition
+// (`.x { ... }`, `.x-m { @include mobile { ... } }`, `.x-t { @include tablet
+// { ... } }`).
+//
+// Usage:
+//   @include responsive("m-auto")
+//     margin: auto !important
+//
+// Produces:
+//   .m-auto         { margin: auto !important; }
+//   .m-auto-m       { @media (max-width: 576px) { margin: auto !important; } }
+//   .m-auto-t       { @media (max-width: 992px) { margin: auto !important; } }
+
+@mixin responsive($selector)
+  .#{$selector}
+    @content
+
+  .#{$selector}-m
+    @include mobile
+      @content
+
+  .#{$selector}-t
+    @include tablet
+      @content
