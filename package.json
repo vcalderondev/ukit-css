@@ -1,27 +1,87 @@
 {
   "name": "@vcalderondev/sasskit",
-  "version": "2.2.0",
-  "description": "The definitive utility-first SASS toolkit for modern web development.",
-  "main": "src/_index.sass",
-  "sass": "src/_index.sass",
-  "style": "src/_index.sass",
+  "version": "3.0.0",
+  "description": "JIT utility-first CSS engine — Tailwind-style on-demand class generation for any framework (React, Vue, Angular, Svelte, Next.js, Astro, vanilla HTML).",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "sasskit": "./bin/sasskit.mjs"
+  },
   "exports": {
-    ".": "./src/_index.sass"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./engine": {
+      "types": "./dist/engine.d.ts",
+      "import": "./dist/engine.js",
+      "require": "./dist/engine.cjs"
+    },
+    "./postcss": {
+      "types": "./dist/postcss.d.ts",
+      "import": "./dist/postcss.js",
+      "require": "./dist/postcss.cjs"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.js",
+      "require": "./dist/vite.cjs"
+    }
   },
   "files": [
-    "src"
+    "dist",
+    "bin",
+    "README.md"
   ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\" \"bin/**/*.mjs\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"bin/**/*.mjs\"",
+    "smoke": "node --experimental-vm-modules ./scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "fast-glob": "^3.3.2",
+    "kleur": "^4.1.5"
+  },
+  "peerDependencies": {
+    "postcss": "^8.4.0",
+    "vite": "^4.0.0 || ^5.0.0 || ^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "postcss": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "postcss": "^8.5.14",
+    "prettier": "^3.8.3",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.0",
+    "vite": "^5.4.21"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vcalderondev/sasskit.git"
   },
   "keywords": [
-    "sass",
-    "utilities",
-    "layout",
     "css",
-    "sasskit",
-    "toolkit"
+    "jit",
+    "utility-first",
+    "tailwind-like",
+    "atomic-css",
+    "postcss",
+    "vite",
+    "sasskit"
   ],
   "publishConfig": {
     "access": "public"

@@ -1,430 +1,224 @@
 # @vcalderondev/sasskit
 
-The definitive utility-first SASS toolkit for modern web development. Unified ruleset for layout, positioning, spacing, typography, borders and basic animations — every utility ships with mobile and tablet responsive variants out of the box.
+JIT utility-first CSS engine — Tailwind-style on-demand class generation for any frontend stack (React, Vue, Angular, Svelte, Next.js, Astro, plain HTML).
+
+`v3.0` is a **complete rewrite**: the SASS-based ruleset became a Node + TypeScript engine that scans your source files, extracts the classes you actually use, and emits **only those** as CSS. The same class names you already know (`m-1-rem`, `grid-cols-3-m`, `rounded-lg`, `text-ellipsis-3`, …) keep working — but your bundle drops from hundreds of kilobytes to a couple of kilobytes.
+
+## Why JIT?
+
+| Mode                    | Output                        | Notes                                                |
+| ----------------------- | ----------------------------- | ---------------------------------------------------- |
+| `v2.x` (full SASS)      | ~770 KB compiled & minified   | Every utility shipped, used or not                   |
+| `v3.x` (JIT)            | typically 2–30 KB per project | Only the classes you actually reference              |
+
+In a real demo project that uses 46 distinct utilities across HTML/JSX/Vue templates the engine emits ~2.4 KB minified — a **99.7% reduction** versus the legacy build.
 
 ## Installation
 
 ```bash
-npm install @vcalderondev/sasskit
+npm install -D @vcalderondev/sasskit
 ```
 
-## Usage
+## Quick start (CLI)
 
-Import the entry point from your main SASS file:
+Create a config file at the root of your project:
 
-```sass
-@use "@vcalderondev/sasskit" as rules
+```js
+// sasskit.config.mjs
+export default {
+  content: ["./src/**/*.{html,js,jsx,ts,tsx,vue,svelte,astro}"],
+  output: "./dist/sasskit.css",
+}
 ```
 
-That single import re-exports every module (`variables`, `mixins`, `base`, `layout`, `display`, `spacing`, `typography`, `keyframes`, `borders`, `grid`).
+Then build:
 
-## Features
-
-- **Utility-first**: inspired by Tailwind, built with pure SASS power.
-- **Responsive-ready**: every utility ships with `-m` (mobile) and `-t` (tablet) variants.
-- **Modern SASS**: uses SASS modules (`@use`, `@forward`) and the modern built-in modules (`sass:string`, `sass:map`, `sass:list`).
-- **Comprehensive coverage**: layout, spacing, typography, borders, display, sizing, animations.
-- **Tweakable**: every scale and named map is overridable via `@use ... with (...)`.
-
-## Responsive convention
-
-Almost every utility class ships in three variants:
-
-| Suffix   | Active when                  | Example     |
-| -------- | ---------------------------- | ----------- |
-| *(none)* | Always                       | `.d-flex`   |
-| `-m`     | viewport ≤ `$mobile` (576px) | `.d-flex-m` |
-| `-t`     | viewport ≤ `$tablet` (992px) | `.d-flex-t` |
-
-Breakpoints live in `_variables.sass` (`$mobile`, `$tablet`, `$desktop`) and can be overridden by re-declaring them before importing the package.
-
-## Base reset & stateless helpers (`_base.sass`)
-
-A light CSS reset is applied automatically: universal `box-sizing: border-box`, zero margin/padding on `html`/`body`, font smoothing on macOS, list-style removed, anchors inherit color, native button chrome cleared, responsive `img`/`video`.
-
-### Background resets
-
-| Class             | Effect                  |
-| ----------------- | ----------------------- |
-| `.bg-transparent` | `background: transparent` |
-| `.bg-none`        | `background: none`      |
-
-Both ship with `-m` / `-t` responsive variants.
-
-### Cursor utilities
-
-`.cursor-{value}` for every keyword in `$cursors`: `pointer, default, move, not-allowed, help, wait, text, grab, grabbing, zoom-in, zoom-out`. All with `-m` / `-t`.
-
-## Display
-
-| Class             | Effect                                |
-| ----------------- | ------------------------------------- |
-| `.d-flex`         | `display: flex`                       |
-| `.d-grid`         | `display: grid`                       |
-| `.d-block`        | `display: block`                      |
-| `.d-inline`       | `display: inline`                     |
-| `.d-inline-block` | `display: inline-block`               |
-| `.d-inline-flex`  | `display: inline-flex`                |
-| `.d-inline-grid`  | `display: inline-grid`                |
-| `.d-none`         | `display: none`                       |
-| `.d-{value}-i`    | Same as `.d-{value}` but `!important` |
-
-Responsive variants: `.d-flex-m`, `.d-none-t`, etc.
-
-## Spacing (margin / padding / gap)
-
-Units: `rem`, `px`, `em`. `gap` only ships in the `px` scale.
-
-### Scales
-
-- **rem:** `0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5`.
-- **px (1px granularity 0–25, then jumps):** `0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 32, 35, 40, 45, 48, 50, 60, 64, 80, 100`.
-- **em:** `1, 1.5, 2`.
-
-### Naming convention
-
-```
-{prop}{dir?}-{value}[-{unit}][-{breakpoint}]
+```bash
+npx sasskit build
 ```
 
-- `prop`: `m` (margin) · `p` (padding) · `gap`
-- `dir`: `t` top · `b` bottom · `s` inline-start · `e` inline-end · `x` horizontal · `y` vertical (optional)
-- `unit`: `rem` · `px` · `em`
-- `breakpoint`: `m` mobile · `t` tablet (optional)
+Or watch for changes during development:
 
-### Examples
-
-| Class        | Result                             |
-| ------------ | ---------------------------------- |
-| `.m-1-rem`   | `margin: 1rem`                     |
-| `.m-0-5-rem` | `margin: 0.5rem`                   |
-| `.m-10px`    | `margin: 10px`                     |
-| `.m-1-em`    | `margin: 1em`                      |
-| `.pt-16px`   | `padding-top: 16px`                |
-| `.mx-2-rem`  | `margin-left/right: 2rem`          |
-| `.py-1-rem`  | `padding-top/bottom: 1rem`         |
-| `.gap-8px`   | `gap: 8px`                         |
-| `.m-1-rem-m` | `margin: 1rem` on mobile only      |
-| `.pt-16px-t` | `padding-top: 16px` on tablet only |
-
-### Legacy aliases (no unit suffix)
-
-Every spacing class also has a short alias without the unit suffix:
-
-```
-.p-1     // padding: 1em (em overrides earlier scales)
-.pt-1    // padding-top: 1em
-.px-1    // padding-left/right: 1em
+```bash
+npx sasskit watch
 ```
 
-Prefer the explicit `-rem` / `-px` / `-em` variants in new code.
+Add `--minify` for production builds, `--output` to override the destination, `--content` to add globs from the command line.
 
-### Auto margins
+## Integration recipes
 
-`.m-auto`, `.mt-auto`, `.mb-auto`, `.ms-auto`, `.me-auto`, `.mx-auto`, `.my-auto` — all with `-m` / `-t` responsive variants.
+### Vite (React / Vue / Svelte / vanilla)
 
-## Typography
+```ts
+// vite.config.ts
+import { defineConfig } from "vite"
+import sasskit from "@vcalderondev/sasskit/vite"
 
-### Font-size
-
-```
-.fs-{value}[-{unit}][-{breakpoint}]
-```
-
-- **px scale:** `8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 26, 28, 32, 36, 38, 40, 42, 48, 56, 64, 86, 108`.
-- **rem scale (25 values, fine-grained):** `0.5, 0.6, 0.65, 0.7, 0.75, 0.78, 0.8, 0.85, 0.875, 0.9, 0.95, 1, 1.1, 1.2, 1.25, 1.3, 1.4, 1.5, 1.75, 1.8, 2, 2.5, 3, 4, 5`.
-- **em scale:** `1, 1.2, 1.5, 2`.
-
-| Class           | Result                        |
-| --------------- | ----------------------------- |
-| `.fs-15px`      | `font-size: 15px`             |
-| `.fs-1-rem`     | `font-size: 1rem`             |
-| `.fs-0-875-rem` | `font-size: 0.875rem`         |
-| `.fs-1-2-em`    | `font-size: 1.2em`            |
-| `.fs-16px-m`    | mobile-only `font-size: 16px` |
-
-The rem scale also exposes legacy aliases without the unit suffix: `.fs-1`, `.fs-1-5`, etc.
-
-### Font-weight
-
-`.fw-100` ... `.fw-900`, plus `.fw-bold`, `.fw-normal`. All with `-m` / `-t` variants.
-
-### Alignment / Transformation
-
-`.text-left`, `.text-right` (physical) and `.text-start`, `.text-end` (logical, LTR-aligned with CSS logical properties that flip dynamically in RTL contexts).
-`.text-center`, `.text-justify` (with `-m` / `-t`).
-`.text-uppercase`, `.text-lowercase`, `.text-capitalize`, `.text-none` (with `-m` / `-t`).
-
-### Line-height
-
-`.lh-1` ... `.lh-4` and half steps `.lh-1-5` ... `.lh-4-5` (with `-m` / `-t`).
-
-### White-space
-
-`.ws-nowrap`, `.ws-normal`, `.ws-pre` (with `-m` / `-t`).
-
-### Text overflow
-
-- `.text-ellipsis` — single-line ellipsis combo (`overflow: hidden` + `text-overflow: ellipsis` + `white-space: nowrap`).
-- `.text-ellipsis-{2–6}` — multi-line line clamping using the `-webkit-line-clamp` pattern (clamps text to 2 up to 6 lines, hiding overflow automatically).
-- Both single-line and multi-line variants ship with `-m` / `-t` responsive variants.
-
-### Letter-spacing
-
-Positive and negative scales, both in `px` and `em`. Negative variants are prefixed with `neg-` (selectors can't start with `-`).
-
-- **px (positive):** `.letter-spacing-1px` ... `.letter-spacing-10px`.
-- **px (negative):** `.letter-spacing-neg-1px` ... `.letter-spacing-neg-10px`.
-- **em (positive):** `.letter-spacing-0-01-em`, `0-02-em`, `0-05-em`, `0-1-em`, `0-15-em`, `0-2-em`.
-- **em (negative):** `.letter-spacing-neg-0-01-em`, ..., `.letter-spacing-neg-0-2-em`.
-
-All with `-m` / `-t` variants.
-
-## Sizing (width / height)
-
-### Percentage scale
-
-`.w-{n}` and `.h-{n}` where `n` ∈ `0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100` — emit `width` / `height` in `%`. Both have `-m` / `-t` variants.
-
-### Content-driven
-
-`.w-max-content` (with `-m` / `-t`).
-
-### Viewport-relative scale (`vw` / `vh`)
-
-`.w-{n}vw` and `.h-{n}vh` where `n` ∈ `10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95, 100`. Useful for hero sections, sticky drawers, full-bleed banners.
-
-`.w-100vw` and `.h-100vh` still ship as standalone aliases (identical to the scale entries).
-
-All viewport classes have `-m` / `-t` variants.
-
-### Fixed pixel sizes
-
-`.w-{n}px`, `.h-{n}px`, `.min-w-{n}px`, `.min-h-{n}px` for:
-
-- Every integer from 1 to 64.
-- Common large sizes: 80, 100, 120, 140, 160, 180, 200, 240, 280, 300, 320, 360, 400, 450, 480, 500, 550, 600, 700, 750, 800.
-
-All have `-m` / `-t` variants.
-
-## Positioning & transforms (`_layout.sass`)
-
-### Offsets
-
-- **Physical Offsets:** `.top-0`, `.bottom-0`, `.left-0`, `.right-0` and centered helpers `.top-50-percent`, `.left-50-percent`.
-- **Logical Offsets:** `.start-0`, `.end-0` and centered helpers `.start-50-percent` / `.start-50`, `.end-50-percent` / `.end-50` (mapping to logical offsets that are fully cross-browser compatible).
-- The 50% offsets pair naturally with the transform helpers below to achieve absolute centering.
-
-Pixel offsets (driven by `$right-px-values` and `$bottom-px-values`):
-
-- **Right/End:** `.right-4px` / `.end-4px`, `.right-6px` / `.end-6px`, `.right-8px` / `.end-8px`, `.right-12px` / `.end-12px`.
-- **Bottom:** `.bottom-16px`, `.bottom-32px`, `.bottom-40px`.
-
-### Transforms
-
-| Class                                       | Effect                                 |
-| ------------------------------------------- | -------------------------------------- |
-| `.translate-x-center` / `.translate-x-neg-50` | `translateX(-50%)` (canonical + alias) |
-| `.translate-y-center` / `.translate-y-neg-50` | `translateY(-50%)` (canonical + alias) |
-| `.translate-center`                         | `translate(-50%, -50%)` (XY centering) |
-| `.transform-none`                           | Clears any existing `transform`        |
-| `.rotate-90`                                | `rotate(90deg)`                        |
-
-Typical pattern for centered absolute elements:
-
-```html
-<div class="position-relative">
-  <div class="position-absolute top-50-percent left-50-percent translate-center">
-    Perfectly centered
-  </div>
-</div>
+export default defineConfig({
+  plugins: [sasskit()],
+})
 ```
 
-All layout utilities have `-m` / `-t` responsive variants.
+```ts
+// main.ts (or main.tsx)
+import "virtual:sasskit.css"
+```
 
-## Position keyword
+HMR is wired in: every time you touch a content file the virtual stylesheet rebuilds and hot-reloads.
 
-`.position-relative`, `.position-absolute`, `.position-fixed`, `.position-sticky` (with `-m` / `-t`).
+### PostCSS (Next.js, Angular, Nuxt, Astro, Webpack, anywhere)
 
-## Flexbox
+```js
+// postcss.config.mjs
+import sasskit from "@vcalderondev/sasskit/postcss"
 
-### Alignment
-
-`.align-items-{value}`, `.align-self-{value}`, `.align-content-{value}` where `value` ∈ `center, start, end, baseline, stretch`. `flex-start` and `flex-end` are aliased to `start` / `end`. All have `-m` / `-t`.
-
-### Justification
-
-`.justify-content-{value}`, `.justify-items-{value}`, `.justify-self-{value}` where `value` ∈ `center, right, left, start, end, space-between, space-around, space-evenly`. All have `-m` / `-t`.
-
-### Flex helpers
-
-- `.flex-0`, `.flex-1`, `.flex-none` — with `-m` / `-t`.
-- `.flex-grow-0`, `.flex-grow-1`, `.flex-shrink-0`, `.flex-shrink-1` — with `-m` / `-t`.
-- `.flex-nowrap`, `.flex-wrap`, `.flex-wrap-reverse` — with `-m` / `-t`.
-- `.flex-direction-row`, `.flex-direction-row-reverse`, `.flex-direction-column`, `.flex-direction-column-reverse` — with `-m` / `-t`.
-
-## Object-fit
-
-`.object-cover`, `.object-contain` (with `-m` / `-t`).
-
-## Overflow
-
-`.overflow-{value}`, `.overflow-x-{value}`, `.overflow-y-{value}` where `value` ∈ `auto, hidden, scroll, visible`. All with `-m` / `-t`.
-
-## Opacity
-
-`.opacity-{n}` where `n` ∈ `0, 2, 4, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 85, 90, 100` — emits `opacity: n / 100`. Includes fine-grained low values (`2`, `4`, `15`, `85`) for subtle disabled or overlay states. With `-m` / `-t`.
-
-## Z-index
-
-Three tiers, all with `-m` / `-t` variants:
-
-- **Units:** `.z-1` ... `.z-10`.
-- **Decades:** `.z-10`, `.z-20`, ..., `.z-100`.
-- **Extreme layers:** `.z-500`, `.z-1000`, `.z-2000`, `.z-5000`, `.z-9999` — for modals, toasts and overlay stacks that must beat anything below.
-
-## Borders (`_borders.sass`)
-
-### Border radius (px)
-
-Full radius:
-
-- `.border-radius-{n}px` and the alias `.rounded-{n}px` for `n` ∈ `0, 1, 2, 4, 6, 8, 10, 11, 12, 14, 16, 20, 24, 28, 30, 32, 40`.
-
-Directional radii (round only one side of the box):
-
-| Class                                         | Affects                                            |
-| --------------------------------------------- | -------------------------------------------------- |
-| `.border-radius-t-{n}px` / `.rounded-t-{n}px` | top-left + top-right                               |
-| `.border-radius-b-{n}px` / `.rounded-b-{n}px` | bottom-left + bottom-right                         |
-| `.border-radius-l-{n}px` / `.rounded-l-{n}px` | top-left + bottom-left                             |
-| `.border-radius-r-{n}px` / `.rounded-r-{n}px` | top-right + bottom-right                           |
-
-All radii — full and directional — ship with `-m` / `-t` responsive variants.
-
-### Border radius (named)
-
-| Class                 | Value    |
-| --------------------- | -------- |
-| `.rounded-xs`         | `2px`    |
-| `.rounded-sm`         | `4px`    |
-| `.rounded-md`         | `8px`    |
-| `.rounded-lg`         | `12px`   |
-| `.rounded-xl`         | `16px`   |
-| `.rounded-2xl`        | `24px`   |
-| `.rounded-full`       | `9999px` |
-| `.rounded-50-percent` | `50%`    |
-
-(`.border-radius-{name}` is the equivalent long form.)
-
-### Applied borders (themed)
-
-`.border` and the per-side helpers `.border-t`, `.border-b`, `.border-l`, `.border-r`, `.border-s`, `.border-e` apply a `1px solid var(--border)` border. The consuming project must declare `--border` in its theme (light / dark / etc.).
+export default {
+  plugins: [sasskit()],
+}
+```
 
 ```css
-:root { --border: #e5e7eb; }
-[data-theme="dark"] { --border: #1f2937; }
+/* src/styles/app.css */
+@sasskit;
 ```
 
-Responsive variants:
+The `@sasskit;` at-rule is expanded to the JIT output. If you omit it the plugin prepends the CSS to the entry file automatically.
 
-- Per-side classes have `-m` / `-t` variants (`.border-t-m`, `.border-l-t`, ...).
-- `.border` (all sides) only has the mobile variant `.border-m`. The tablet name `.border-t` is intentionally taken by the top-side helper; for tablet-only borders, compose `.border-{side}-t` per side.
+### Next.js (without a custom PostCSS plugin)
 
-### Border styles (clearing)
+Use the CLI in a script and import the generated file:
 
-`.border-none`, `.border-transparent`, plus per-side helpers `.border-t-none`, `.border-b-none`, `.border-l-none`, `.border-r-none`, `.border-s-none`, `.border-e-none`.
+```jsonc
+// package.json
+{
+  "scripts": {
+    "css:build": "sasskit build -o app/sasskit.css --minify",
+    "css:dev":   "sasskit watch -o app/sasskit.css"
+  }
+}
+```
 
-All have `-m` / `-t` variants.
+```tsx
+// app/layout.tsx
+import "./sasskit.css"
+```
 
-## Grid (`_grid.sass`)
+### Angular
 
-CSS Grid helpers. All ship with `-m` / `-t` responsive variants so layouts can collapse to a single column at smaller viewports.
+```jsonc
+// angular.json (excerpt)
+{
+  "styles": ["src/sasskit.css", "src/styles.scss"]
+}
+```
 
-### Columns
+```bash
+# during development
+npx sasskit watch -o src/sasskit.css
+# before production build
+npx sasskit build -o src/sasskit.css --minify
+```
 
-| Class               | Effect                                                                |
-| ------------------- | --------------------------------------------------------------------- |
-| `.grid-cols-{1–12}` | `display: grid` + `grid-template-columns: repeat(N, minmax(0, 1fr))`  |
-| `.grid-col-span-{1–12}` | `grid-column: span N / span N`                                    |
-| `.grid-col-span-full`   | `grid-column: 1 / -1` (full width)                                |
+### Plain HTML
 
-### Rows
-
-| Class                | Effect                                                              |
-| -------------------- | ------------------------------------------------------------------- |
-| `.grid-rows-{1–6}`   | `display: grid` + `grid-template-rows: repeat(N, minmax(0, 1fr))`   |
-| `.grid-row-span-{1–6}` | `grid-row: span N / span N`                                       |
-| `.grid-row-span-full`  | `grid-row: 1 / -1`                                                |
-
-### Auto-flow
-
-| Class                  | `grid-auto-flow` value |
-| ---------------------- | ---------------------- |
-| `.grid-flow-row`       | `row`                  |
-| `.grid-flow-col`       | `column`               |
-| `.grid-flow-dense`     | `dense`                |
-| `.grid-flow-row-dense` | `row dense`            |
-| `.grid-flow-col-dense` | `column dense`         |
-
-### Common patterns
+```bash
+npx sasskit build --content "./public/**/*.html" -o ./public/sasskit.css --minify
+```
 
 ```html
-<!-- 3 columns on desktop, 1 on mobile -->
-<div class="grid-cols-3 grid-cols-1-m">
-  <div>A</div><div>B</div><div>C</div>
-</div>
-
-<!-- Hero card that spans the full grid row -->
-<div class="grid-cols-4">
-  <div class="grid-col-span-full">Hero</div>
-  <div>1</div><div>2</div><div>3</div><div>4</div>
-</div>
+<link rel="stylesheet" href="/sasskit.css" />
 ```
 
-## Animations (`_keyframes.sass`)
+## Configuration
 
-| Keyframe       | Helper class          | Description                        |
-| -------------- | --------------------- | ---------------------------------- |
-| `fadeIn`       | `.animate-fade-in`    | Opacity 0 → 1 over 0.3s            |
-| `fadeInUp`     | `.animate-fade-in-up` | Fade + slight upward translate     |
-| `fadeInScale`  | *(keyframe only)*     | Fade + scale up (combine yourself) |
-| `slideInRight` | *(keyframe only)*     | Slide from the right               |
-| `spin`         | `.animate-spin`       | Endless rotation                   |
-| `pulse`        | `.animate-pulse`      | Soft opacity + scale pulse         |
+```ts
+// sasskit.config.mjs (or .js / .cjs / .json)
+import { defineConfig } from "@vcalderondev/sasskit"
 
-## Tokens at a glance
+export default defineConfig({
+  // Globs scanned for class candidates. The engine reads each file as text
+  // and pulls out any token that could be a utility class — so it works with
+  // Angular [class.x], Vue :class, React clsx(), Svelte class:foo, etc.
+  content: ["./src/**/*.{html,ts,tsx,vue,svelte}"],
 
-These are the lists that drive class generation — override them via `@use ... with` if you need different values.
+  // Output path (used by the CLI). Plugins ignore this.
+  output: "./dist/app.css",
 
-| Token                     | Where             | Default                                                    |
-| ------------------------- | ----------------- | ---------------------------------------------------------- |
-| `$mobile`                 | `_variables.sass` | `576px`                                                    |
-| `$tablet`                 | `_variables.sass` | `992px`                                                    |
-| `$desktop`                | `_variables.sass` | `1200px`                                                   |
-| `$sizes` (w / h %)        | `_variables.sass` | `0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100`|
-| `$opacities`              | `_variables.sass` | `0, 2, 4, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 85, 90, 100` |
-| `$overflows`              | `_variables.sass` | `auto, hidden, scroll, visible`                            |
-| `$border-radius-px`       | `_variables.sass` | `0, 1, 2, 4, 6, 8, 10, 11, 12, 14, 16, 20, 24, 28, 30, 32, 40` |
-| `$border-radius-named`    | `_variables.sass` | `xs: 2, sm: 4, md: 8, lg: 12, xl: 16, 2xl: 24, full: 9999` |
-| `$cursors`                | `_variables.sass` | `pointer, default, move, not-allowed, help, wait, text, grab, grabbing, zoom-in, zoom-out` |
-| `$viewport-sizes` (vw/vh) | `_display.sass`   | `10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95, 100`      |
-| `$extreme-z` (z-index)    | `_display.sass`   | `500, 1000, 2000, 5000, 9999`                              |
-| `$right-px-values`        | `_layout.sass`    | `4, 6, 8, 12`                                              |
-| `$bottom-px-values`       | `_layout.sass`    | `16, 32, 40`                                               |
+  // Breakpoint overrides — same defaults as the legacy SASS package.
+  mobile: 576,
+  tablet: 992,
+  desktop: 1200,
 
-## Customising
+  // Toggle the CSS reset + the keyframes block.
+  preflight: true,
+  keyframes: true,
 
-All scales and named maps live in `_variables.sass`. Re-declare them with `@use ... with (...)` before forwarding the rest of the library if you need to customise breakpoints, named radii, opacity steps, etc.
+  // Class names to always include even if they don't appear in source files
+  // (useful for classes that are composed dynamically: `m-${size}-rem`, etc.).
+  safelist: ["m-1-rem", "m-2-rem", "m-3-rem"],
 
-```sass
-@use "@vcalderondev/sasskit/src/variables" with (
-  $mobile: 640px,
-  $tablet: 1024px
-)
-@use "@vcalderondev/sasskit"
+  // Minify the output.
+  minify: false,
+})
+```
+
+## Utility reference
+
+The class vocabulary is unchanged from `v2.x`. Every utility ships with a base, `-m` (mobile, ≤ 576 px) and `-t` (tablet, 577–992 px) variant.
+
+| Category   | Examples                                                                  |
+| ---------- | ------------------------------------------------------------------------- |
+| Display    | `d-flex`, `d-grid`, `d-none-m`                                            |
+| Sizing     | `w-50`, `h-100vh`, `min-w-200px`, `max-w-90`                              |
+| Spacing    | `m-1-rem`, `pt-16px`, `gap-1-5-rem`, `mx-auto`                            |
+| Position   | `position-absolute`, `top-50-percent`, `left-50-percent`, `translate-center` |
+| Flex       | `align-items-center`, `justify-content-between`, `flex-direction-column`  |
+| Typography | `fs-1-rem`, `fw-700`, `text-center`, `lh-1-5`, `text-ellipsis-3`          |
+| Borders    | `rounded-lg`, `rounded-r-12px`, `border`, `border-t`, `border-none`       |
+| Grid       | `grid-cols-3`, `grid-cols-1-m`, `grid-col-span-2`, `grid-row-span-full`   |
+| Z-index    | `z-1`, `z-50`, `z-9999`                                                   |
+| Opacity    | `opacity-50`, `opacity-0`                                                 |
+| Overflow   | `overflow-hidden`, `overflow-x-auto`                                      |
+| Animate    | `animate-fade-in`, `animate-fade-in-up`, `animate-spin`, `animate-pulse`  |
+
+Naming convention (spacing): `{prop}{dir?}-{value}[-{unit}][-{breakpoint}]`. Example: `pt-1-5-rem-m` → `padding-top: 1.5rem` on mobile.
+
+For the full vocabulary refer to the matchers in `src/core/matchers/` — each file documents the patterns it recognises.
+
+## Programmatic API
+
+```ts
+import { build, Engine, defineConfig } from "@vcalderondev/sasskit"
+
+// One-shot build
+const { css, matchedClasses } = await build({
+  content: ["./src/**/*.tsx"],
+})
+
+// Long-lived engine (incremental rebuilds, watch mode, plugins)
+const engine = new Engine({ content: ["./src/**/*.tsx"] })
+await engine.scanAll()
+const { css: output } = engine.build()
+```
+
+## Migrating from v2.x
+
+The class names are identical, so 95 % of projects just need to swap the SASS import for the JIT setup:
+
+```diff
+- // styles.sass
+- @use "@vcalderondev/sasskit" as rules
++ // postcss.config.mjs (or vite.config.ts / CLI)
++ import sasskit from "@vcalderondev/sasskit/postcss"
++ export default { plugins: [sasskit()] }
+```
+
+`v2.x` will keep working on npm under that major; install it explicitly if you need the legacy SASS-only build:
+
+```bash
+npm install @vcalderondev/sasskit@^2
 ```
 
 ## License
 
-MIT — Victor Calderon <mail@vcalderon.dev>
+MIT — Victor Calderon &lt;mail@vcalderon.dev&gt;
