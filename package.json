@@ -1,6 +1,6 @@
 {
   "name": "@vcalderondev/ukit-css",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JIT utility-first CSS engine — Tailwind-style on-demand class generation for any framework (React, Vue, Angular, Svelte, Next.js, Astro, vanilla HTML).",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -71,7 +71,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vcalderondev/sasskit.git"
+    "url": "git+https://github.com/vcalderondev/ukit-css.git"
   },
   "keywords": [
     "css",
@@ -89,7 +89,7 @@
   "author": "Victor Calderon <mail@vcalderon.dev>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vcalderondev/sasskit/issues"
+    "url": "https://github.com/vcalderondev/ukit-css/issues"
   },
-  "homepage": "https://github.com/vcalderondev/sasskit#readme"
+  "homepage": "https://github.com/vcalderondev/ukit-css#readme"
 }
