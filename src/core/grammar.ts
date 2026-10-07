@@ -48,6 +48,8 @@ import {
   GRID_FLOW_MAP,
   JUSTIFY_VALUES,
   LETTER_SPACING_EM,
+  LETTER_SPACING_PX,
+  LINE_HEIGHTS,
   OBJECT_FITS,
   OFFSET_ANCHORS,
   OPACITIES,
@@ -170,12 +172,15 @@ const FS_VALUES = [
 
 const LETTER_SPACING_VALUES = [
   ...range(1, 10).map(String),
-  ...range(1, 10).map((n) => `${n}px`),
+  ...LETTER_SPACING_PX.map(dasherize).map((v) => `${v}px`),
   ...range(1, 10).map((n) => `neg-${n}`),
-  ...range(1, 10).map((n) => `neg-${n}px`),
+  ...LETTER_SPACING_PX.map(dasherize).map((v) => `neg-${v}px`),
   ...LETTER_SPACING_EM.map(dasherize).map((v) => `${v}-em`),
   ...LETTER_SPACING_EM.map(dasherize).map((v) => `neg-${v}-em`),
 ]
+
+/** Line-height values in the dash-for-dot form the matcher accepts. */
+const LINE_HEIGHT_VALUES = LINE_HEIGHTS.map(dasherize)
 
 /** z-index: units 1–10, decades up to 100, plus extreme presets. */
 const Z_VALUES = [
@@ -184,12 +189,15 @@ const Z_VALUES = [
   ...Z_EXTREME,
 ].map(String)
 
-/** Offset values: anchors, px, rem and em (see `matchOffset`). */
+/** Offset values: anchors, px, rem and em, plus their `neg-` forms. */
 const OFFSET_VALUES = [
   ...Object.keys(OFFSET_ANCHORS),
   ...strings(PX_VALUES).map((n) => `${n}px`),
   ...REM_DASHED.map((v) => `${v}-rem`),
   ...EM_DASHED.map((v) => `${v}-em`),
+  ...strings(PX_VALUES).map((n) => `neg-${n}px`),
+  ...REM_DASHED.map((v) => `neg-${v}-rem`),
+  ...EM_DASHED.map((v) => `neg-${v}-em`),
 ]
 
 const SPACING_DIRECTIONS = [
@@ -243,6 +251,19 @@ const SPACING_TARGETS: Record<string, string> = {
 
 const SIZING_FIXED_PX = [...FIXED_SIZES].map((n) => `${n}px`)
 const SIZING_LEGACY = [...FIXED_SIZES].map(String)
+
+/**
+ * Viewport-unit constraints. The constraint helpers take the axis-appropriate
+ * unit only: `.max-w-100vw` but not `.max-w-100vh` (see `matchFixedSize`).
+ */
+const SIZING_VIEWPORT_VW = strings(VIEWPORT_SIZES).map((n) => `${n}vw`)
+const SIZING_VIEWPORT_VH = strings(VIEWPORT_SIZES).map((n) => `${n}vh`)
+
+/** Percentage constraints: `.max-w-90-percent`. */
+const SIZING_PERCENT = strings(SIZE_PERCENTS).map((n) => `${n}-percent`)
+
+/** `auto` reset for the constraint helpers: `.min-h-auto`. */
+const SIZING_AUTO = ["auto"]
 
 // -----------------------------------------------------------------------------
 // The grammar
@@ -317,18 +338,36 @@ export const FAMILIES: readonly GrammarFamily[] = [
   {
     id: "sizing-fixed",
     title: "Sizing — fixed pixels",
-    summary: "Pixel width/height and min/max constraints: `w-320px`, `max-w-1200`.",
+    summary:
+      "Pixel width/height and min/max constraints: `w-320px`, `max-w-1200`, `min-h-100vh`, `max-w-90-percent`.",
     matchers: ["matchFixedSize"],
     stems: [
       stem("w", SIZING_FIXED_PX, "width"),
       stem("h", SIZING_FIXED_PX, "height"),
-      stem("max-w", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "max-width"),
-      stem("min-w", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "min-width"),
-      stem("max-h", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "max-height"),
-      stem("min-h", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "min-height"),
+      stem(
+        "max-w",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VW, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "max-width",
+      ),
+      stem(
+        "min-w",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VW, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "min-width",
+      ),
+      stem(
+        "max-h",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VH, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "max-height",
+      ),
+      stem(
+        "min-h",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VH, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "min-height",
+      ),
     ],
     cssProperties: ["width", "height", "max-width", "min-width", "max-height", "min-height"],
-    examples: ["w-320px", "h-64px", "max-w-1200", "min-h-100"],
+    examples: ["w-320px", "h-64px", "max-w-1200", "min-h-100vh", "max-w-90-percent"],
+    docs: "The `min-`/`max-` helpers also accept the axis-appropriate viewport unit (`min-h-100vh`, `max-w-100vw`), percentages (`max-w-90-percent`), `auto` (`min-h-auto`) and a legacy bare-pixel form (`max-w-1200`).",
   },
   {
     id: "sizing-viewport",
@@ -375,12 +414,12 @@ export const FAMILIES: readonly GrammarFamily[] = [
     id: "offset",
     title: "Offsets",
     summary:
-      "Edge offsets in px/rem/em or anchors: `top-0`, `left-50-percent`, `top-16px`, `right-1-5-rem`.",
+      "Edge offsets in px/rem/em or anchors: `top-0`, `left-50-percent`, `top-16px`, `right-1-5-rem`, `bottom-neg-5px`.",
     matchers: ["matchOffset"],
     stems: SIDES.map((side) => stem(side, OFFSET_VALUES, side)),
     cssProperties: ["top", "bottom", "left", "right"],
-    examples: ["top-0", "left-50-percent", "bottom-16px", "start-50"],
-    docs: "`start` maps to `left` and `end` maps to `right`, mirroring the logical-side helpers.",
+    examples: ["top-0", "left-50-percent", "bottom-16px", "start-50", "right-neg-5px"],
+    docs: "`start` maps to `left` and `end` maps to `right`, mirroring the logical-side helpers. Numeric offsets take a `neg-` prefix for negative values (`top-neg-8px`); the anchors `0`, `50` and `50-percent` are always positive.",
   },
   {
     id: "transform",
@@ -498,11 +537,12 @@ export const FAMILIES: readonly GrammarFamily[] = [
   {
     id: "z-index",
     title: "Z-index",
-    summary: "Stacking order: `z-1`…`z-10`, decades up to `z-100`, plus presets like `z-9999`.",
+    summary:
+      "Stacking order: `z-1`…`z-10`, decades up to `z-100`, plus presets like `z-200`, `z-3000`, `z-9999`.",
     matchers: ["matchZIndex"],
     stems: [stem("z", Z_VALUES, "z-index")],
     cssProperties: ["z-index"],
-    examples: ["z-1", "z-50", "z-9999"],
+    examples: ["z-1", "z-50", "z-200", "z-9999"],
   },
   {
     id: "overflow",
@@ -582,11 +622,12 @@ export const FAMILIES: readonly GrammarFamily[] = [
   {
     id: "line-height",
     title: "Line height",
-    summary: "`lh-1`, `lh-1-5`, `lh-2`.",
+    summary: "`lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` — the dash is the decimal point.",
     matchers: ["matchLineHeight"],
-    stems: [stem("lh", [...range(1, 4).map(String), ...range(1, 4).map((n) => `${n}-5`)], "line-height")],
+    stems: [stem("lh", LINE_HEIGHT_VALUES, "line-height")],
     cssProperties: ["line-height"],
-    examples: ["lh-1", "lh-1-5"],
+    examples: ["lh-1", "lh-1-2", "lh-1-5", "lh-4-5"],
+    docs: "`1`–`2` in steps of `0.1`, then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size.",
   },
   {
     id: "white-space",
@@ -600,11 +641,13 @@ export const FAMILIES: readonly GrammarFamily[] = [
   {
     id: "letter-spacing",
     title: "Letter spacing",
-    summary: "`letter-spacing-1`, `letter-spacing-0-1-em`, `letter-spacing-neg-1`.",
+    summary:
+      "`letter-spacing-1`, `letter-spacing-0-5px`, `letter-spacing-0-1-em`, `letter-spacing-neg-1`.",
     matchers: ["matchLetterSpacing"],
     stems: [stem("letter-spacing", LETTER_SPACING_VALUES, "letter-spacing")],
     cssProperties: ["letter-spacing"],
-    examples: ["letter-spacing-1", "letter-spacing-0-1-em", "letter-spacing-neg-2"],
+    examples: ["letter-spacing-1", "letter-spacing-0-5px", "letter-spacing-0-1-em", "letter-spacing-neg-2"],
+    docs: "Pixel values accept the fractional `0-5` step (`letter-spacing-0-5px`); `em` values are relative to the element's font size. Every numeric form also has a `neg-` counterpart.",
   },
 
   // --- Borders ---------------------------------------------------------------

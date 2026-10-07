@@ -2,7 +2,7 @@
 
 # ukit-css class reference
 
-The engine generates CSS on demand, but the **vocabulary is finite**: 4,031 base utilities, 12,092 including the `-m` and `-t` variants. This page is the complete reference.
+The engine generates CSS on demand, but the **vocabulary is finite**: 4,703 base utilities, 14,108 including the `-m` and `-t` variants. This page is the complete reference.
 
 ## Naming rules
 
@@ -31,8 +31,8 @@ These compile successfully, so nothing warns you — but they do not mean what t
 | `fs-1` | a bare number in the font-size family is rem — fs-1 is font-size: 1rem. |
 | `rounded-md` | 8px here, not Tailwind's 6px. The named radius scale is xs(2) sm(4) md(8) lg(12) xl(16) 2xl(24) full(9999). |
 | `lh-1-5` | the dash is a decimal point, so this is line-height: 1.5. |
-| `lh-4-5` | only 1, 2, 3, 4 and 1.5, 2.5, 3.5, 4.5 exist — there is no lh-1-25. |
-| `h-100vh` | viewport height works for h and w only. min-h and max-h accept pixels, so Tailwind's min-h-screen has no equivalent here. |
+| `lh-4-5` | the dash is a decimal point, so this is line-height: 4.5. The scale is 1–2 in steps of 0.1, then 2.5, 3, 3.5, 4, 4.5 — there is no lh-1-25. |
+| `h-100vh` | viewport units are written as a suffix and work for h/w plus the constraint helpers (min-h-100vh, max-h-60vh, max-w-100vw). There is no 'screen' keyword. |
 | `border` | paints 1px solid var(--border); set --border to theme it. |
 | `animate-spin` | the only family emitted without !important, so it stays overridable. |
 
@@ -48,11 +48,11 @@ These compile successfully, so nothing warns you — but they do not mean what t
 | [Pointer events](#pointer-events) | 2 | — | `pointer-events` |
 | [Display](#display) | 16 | `d` | `display` |
 | [Sizing — percentages](#sizing-percent) | 30 | `w` `h` | `width`, `height` |
-| [Sizing — fixed pixels](#sizing-fixed) | 900 | `w` `h` `max-w` `min-w` `max-h` `min-h` | `width`, `height`, `max-width`, `min-width`, `max-height`, `min-height` |
-| [Sizing — viewport](#sizing-viewport) | 26 | `w` `h` | `width`, `height` |
+| [Sizing — fixed pixels](#sizing-fixed) | 1060 | `w` `h` `max-w` `min-w` `max-h` `min-h` | `width`, `height`, `max-width`, `min-width`, `max-height`, `min-height` |
+| [Sizing — viewport](#sizing-viewport) | 28 | `w` `h` | `width`, `height` |
 | [Sizing — intrinsic & auto](#sizing-content) | 8 | — | `width`, `height` |
 | [Position](#position) | 4 | `position` | `position` |
-| [Offsets](#offset) | 330 | `top` `bottom` `left` `right` `start` `end` | `top`, `bottom`, `left`, `right` |
+| [Offsets](#offset) | 678 | `top` `bottom` `left` `right` `start` `end` | `top`, `bottom`, `left`, `right` |
 | [Transform helpers](#transform) | 8 | — | `transform` |
 | [Float](#float) | 5 | `float` | `float` |
 | [Clearfix](#clearfix) | 1 | — | `clear` |
@@ -64,17 +64,17 @@ These compile successfully, so nothing warns you — but they do not mean what t
 | [Flex direction](#flex-direction) | 4 | `flex-direction` | `flex-direction` |
 | [Flex flow](#flex-flow) | 7 | `flex-flow` | `flex-flow` |
 | [Object fit](#object-fit) | 5 | `object` | `object-fit` |
-| [Z-index](#z-index) | 26 | `z` | `z-index` |
+| [Z-index](#z-index) | 28 | `z` | `z-index` |
 | [Overflow](#overflow) | 12 | `overflow` `overflow-x` `overflow-y` | `overflow`, `overflow-x`, `overflow-y` |
-| [Opacity](#opacity) | 18 | `opacity` | `opacity` |
-| [Spacing — margin, padding, gap](#spacing) | 2287 | `m` `mt` `mb` `ml` `mr` `ms` `me` `mx` `my` `p` `pt` `pb` `pl` `pr` `ps` `pe` `px` `py` `gap` | `margin`, `padding`, `gap` |
-| [Font size](#font-size) | 79 | `fs` | `font-size` |
+| [Opacity](#opacity) | 19 | `opacity` | `opacity` |
+| [Spacing — margin, padding, gap](#spacing) | 2401 | `m` `mt` `mb` `ml` `mr` `ms` `me` `mx` `my` `p` `pt` `pb` `pl` `pr` `ps` `pe` `px` `py` `gap` | `margin`, `padding`, `gap` |
+| [Font size](#font-size) | 92 | `fs` | `font-size` |
 | [Font weight](#font-weight) | 11 | `fw` | `font-weight` |
 | [Text align, transform & ellipsis](#text) | 16 | `text` | `text-align`, `text-transform`, `text-overflow`, `white-space` |
-| [Line height](#line-height) | 8 | `lh` | `line-height` |
+| [Line height](#line-height) | 26 | `lh` | `line-height` |
 | [White space](#white-space) | 6 | `ws` | `white-space` |
-| [Letter spacing](#letter-spacing) | 52 | `letter-spacing` | `letter-spacing` |
-| [Border radius](#border-radius) | 186 | `rounded` `border-radius` | `border-radius` |
+| [Letter spacing](#letter-spacing) | 56 | `letter-spacing` | `letter-spacing` |
+| [Border radius](#border-radius) | 196 | `rounded` `border-radius` | `border-radius` |
 | [Borders](#border) | 15 | — | `border`, `border-top`, `border-right`, `border-bottom`, `border-left` |
 | [Grid columns](#grid-cols) | 12 | `grid-cols` | `grid-template-columns`, `display` |
 | [Grid column span](#grid-col-span) | 13 | `grid-col-span` | `grid-column` |
@@ -167,20 +167,22 @@ A bare number is always a percentage. Use `w-100px` or `w-100vw` for other units
 
 ### Sizing — fixed pixels
 
-Pixel width/height and min/max constraints: `w-320px`, `max-w-1200`.
+Pixel width/height and min/max constraints: `w-320px`, `max-w-1200`, `min-h-100vh`, `max-w-90-percent`.
+
+The `min-`/`max-` helpers also accept the axis-appropriate viewport unit (`min-h-100vh`, `max-w-100vw`), percentages (`max-w-90-percent`), `auto` (`min-h-auto`) and a legacy bare-pixel form (`max-w-1200`).
 
 - **Matchers:** `matchFixedSize`
 - **CSS properties:** `width`, `height`, `max-width`, `min-width`, `max-height`, `min-height`
-- **Examples:** `w-320px`, `h-64px`, `max-w-1200`, `min-h-100`
+- **Examples:** `w-320px`, `h-64px`, `max-w-1200`, `min-h-100vh`, `max-w-90-percent`
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `w-` | width | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+66 more) |
-| `h-` | height | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+66 more) |
-| `max-w-` | max-width | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+156 more) |
-| `min-w-` | min-width | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+156 more) |
-| `max-h-` | max-height | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+156 more) |
-| `min-h-` | min-height | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+156 more) |
+| `w-` | width | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+70 more) |
+| `h-` | height | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+70 more) |
+| `max-w-` | max-width | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+194 more) |
+| `min-w-` | min-width | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+194 more) |
+| `max-h-` | max-height | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+194 more) |
+| `min-h-` | min-height | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+194 more) |
 
 <a id="sizing-viewport"></a>
 
@@ -194,8 +196,8 @@ Viewport-relative sizing: `w-100vw`, `h-50vh`.
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `w-` | width | `10vw`, `20vw`, `25vw`, `30vw`, `40vw`, `50vw`, `60vw`, `70vw`, `75vw`, `80vw`, `90vw`, `95vw`, `100vw` |
-| `h-` | height | `10vh`, `20vh`, `25vh`, `30vh`, `40vh`, `50vh`, `60vh`, `70vh`, `75vh`, `80vh`, `90vh`, `95vh`, `100vh` |
+| `w-` | width | `10vw`, `20vw`, `25vw`, `30vw`, `40vw`, `50vw`, `60vw`, `70vw`, `75vw`, `80vw`, `85vw`, `90vw`, `95vw`, `100vw` |
+| `h-` | height | `10vh`, `20vh`, `25vh`, `30vh`, `40vh`, `50vh`, `60vh`, `70vh`, `75vh`, `80vh`, `85vh`, `90vh`, `95vh`, `100vh` |
 
 <a id="sizing-content"></a>
 
@@ -226,22 +228,22 @@ Sets the `position` value: `position-absolute`, `position-sticky`.
 
 ### Offsets
 
-Edge offsets in px/rem/em or anchors: `top-0`, `left-50-percent`, `top-16px`, `right-1-5-rem`.
+Edge offsets in px/rem/em or anchors: `top-0`, `left-50-percent`, `top-16px`, `right-1-5-rem`, `bottom-neg-5px`.
 
-`start` maps to `left` and `end` maps to `right`, mirroring the logical-side helpers.
+`start` maps to `left` and `end` maps to `right`, mirroring the logical-side helpers. Numeric offsets take a `neg-` prefix for negative values (`top-neg-8px`); the anchors `0`, `50` and `50-percent` are always positive.
 
 - **Matchers:** `matchOffset`
 - **CSS properties:** `top`, `bottom`, `left`, `right`
-- **Examples:** `top-0`, `left-50-percent`, `bottom-16px`, `start-50`
+- **Examples:** `top-0`, `left-50-percent`, `bottom-16px`, `start-50`, `right-neg-5px`
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `top-` | top | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+31 more) |
-| `bottom-` | bottom | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+31 more) |
-| `left-` | left | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+31 more) |
-| `right-` | right | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+31 more) |
-| `start-` | start | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+31 more) |
-| `end-` | end | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+31 more) |
+| `top-` | top | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+89 more) |
+| `bottom-` | bottom | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+89 more) |
+| `left-` | left | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+89 more) |
+| `right-` | right | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+89 more) |
+| `start-` | start | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+89 more) |
+| `end-` | end | `0`, `50`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, … (+89 more) |
 
 <a id="transform"></a>
 
@@ -399,15 +401,15 @@ Not to be confused with `align-items-*`, which is flexbox alignment.
 
 ### Z-index
 
-Stacking order: `z-1`…`z-10`, decades up to `z-100`, plus presets like `z-9999`.
+Stacking order: `z-1`…`z-10`, decades up to `z-100`, plus presets like `z-200`, `z-3000`, `z-9999`.
 
 - **Matchers:** `matchZIndex`
 - **CSS properties:** `z-index`
-- **Examples:** `z-1`, `z-50`, `z-9999`
+- **Examples:** `z-1`, `z-50`, `z-200`, `z-9999`
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `z-` | z-index | `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `10`, `20`, `30`, `40`, `50`, `60`, `70`, `80`, `90`, `100`, `500`, `1000`, `2000`, `5000`, … (+2 more) |
+| `z-` | z-index | `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `10`, `20`, `30`, `40`, `50`, `60`, `70`, `80`, `90`, `100`, `200`, `500`, `1000`, `2000`, … (+4 more) |
 
 <a id="overflow"></a>
 
@@ -437,7 +439,7 @@ Stacking order: `z-1`…`z-10`, decades up to `z-100`, plus presets like `z-9999
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `opacity-` | opacity | `0`, `2`, `4`, `5`, `10`, `15`, `20`, `25`, `30`, `40`, `50`, `60`, `70`, `75`, `80`, `85`, `90`, `100` |
+| `opacity-` | opacity | `0`, `2`, `4`, `5`, `10`, `15`, `20`, `25`, `30`, `40`, `50`, `55`, `60`, `70`, `75`, `80`, `85`, `90`, `100` |
 
 <a id="spacing"></a>
 
@@ -454,25 +456,25 @@ Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` h
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `m-` | margin | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `mt-` | margin-top | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `mb-` | margin-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `ml-` | margin-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `mr-` | margin-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `ms-` | margin-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `me-` | margin-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `mx-` | margin-left + margin-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `my-` | margin-top + margin-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `p-` | padding | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `pt-` | padding-top | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `pb-` | padding-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `pl-` | padding-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `pr-` | padding-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `ps-` | padding-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `pe-` | padding-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `px-` | padding-left + padding-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `py-` | padding-top + padding-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
-| `gap-` | gap | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+96 more) |
+| `m-` | margin | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `mt-` | margin-top | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `mb-` | margin-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `ml-` | margin-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `mr-` | margin-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `ms-` | margin-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `me-` | margin-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `mx-` | margin-left + margin-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `my-` | margin-top + margin-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `p-` | padding | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `pt-` | padding-top | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `pb-` | padding-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `pl-` | padding-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `pr-` | padding-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `ps-` | padding-left | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `pe-` | padding-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `px-` | padding-left + padding-right | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `py-` | padding-top + padding-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
+| `gap-` | gap | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
 
 <a id="font-size"></a>
 
@@ -486,7 +488,7 @@ Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` h
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `fs-` | font-size | `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `18px`, `20px`, `22px`, `24px`, `26px`, `28px`, `32px`, `36px`, `38px`, `40px`, `42px`, `48px`, `56px`, `64px`, `86px`, … (+55 more) |
+| `fs-` | font-size | `6px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `20px`, `22px`, `24px`, `26px`, `28px`, `32px`, `36px`, `38px`, `40px`, `42px`, `48px`, `56px`, … (+68 more) |
 
 <a id="font-weight"></a>
 
@@ -521,15 +523,17 @@ Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` h
 
 ### Line height
 
-`lh-1`, `lh-1-5`, `lh-2`.
+`lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` — the dash is the decimal point.
+
+`1`–`2` in steps of `0.1`, then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size.
 
 - **Matchers:** `matchLineHeight`
 - **CSS properties:** `line-height`
-- **Examples:** `lh-1`, `lh-1-5`
+- **Examples:** `lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5`
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `lh-` | line-height | `1`, `2`, `3`, `4`, `1-5`, `2-5`, `3-5`, `4-5` |
+| `lh-` | line-height | `1`, `1-05`, `1-1`, `1-15`, `1-2`, `1-25`, `1-3`, `1-35`, `1-4`, `1-45`, `1-5`, `1-55`, `1-6`, `1-65`, `1-7`, `1-75`, `1-8`, `1-85`, `1-9`, `1-95`, `2`, `2-5`, `3`, `3-5`, … (+2 more) |
 
 <a id="white-space"></a>
 
@@ -549,15 +553,17 @@ Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` h
 
 ### Letter spacing
 
-`letter-spacing-1`, `letter-spacing-0-1-em`, `letter-spacing-neg-1`.
+`letter-spacing-1`, `letter-spacing-0-5px`, `letter-spacing-0-1-em`, `letter-spacing-neg-1`.
+
+Pixel values accept the fractional `0-5` step (`letter-spacing-0-5px`); `em` values are relative to the element's font size. Every numeric form also has a `neg-` counterpart.
 
 - **Matchers:** `matchLetterSpacing`
 - **CSS properties:** `letter-spacing`
-- **Examples:** `letter-spacing-1`, `letter-spacing-0-1-em`, `letter-spacing-neg-2`
+- **Examples:** `letter-spacing-1`, `letter-spacing-0-5px`, `letter-spacing-0-1-em`, `letter-spacing-neg-2`
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `letter-spacing-` | letter-spacing | `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `neg-1`, `neg-2`, `neg-3`, `neg-4`, … (+28 more) |
+| `letter-spacing-` | letter-spacing | `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `0-5px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `neg-1`, `neg-2`, `neg-3`, … (+32 more) |
 
 <a id="border-radius"></a>
 
@@ -571,8 +577,8 @@ Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` h
 
 | Stem | Targets | Values |
 | --- | --- | --- |
-| `rounded-` | border-radius | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `full`, `50-percent`, `0px`, `1px`, `2px`, `4px`, `6px`, `8px`, `10px`, `11px`, `12px`, `14px`, `16px`, `20px`, `24px`, `28px`, `30px`, `32px`, … (+69 more) |
-| `border-radius-` | border-radius | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `full`, `50-percent`, `0px`, `1px`, `2px`, `4px`, `6px`, `8px`, `10px`, `11px`, `12px`, `14px`, `16px`, `20px`, `24px`, `28px`, `30px`, `32px`, … (+69 more) |
+| `rounded-` | border-radius | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `full`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `6px`, `8px`, `10px`, `11px`, `12px`, `14px`, `16px`, `20px`, `24px`, `28px`, `30px`, … (+74 more) |
+| `border-radius-` | border-radius | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `full`, `50-percent`, `0px`, `1px`, `2px`, `3px`, `4px`, `6px`, `8px`, `10px`, `11px`, `12px`, `14px`, `16px`, `20px`, `24px`, `28px`, `30px`, … (+74 more) |
 
 <a id="border"></a>
 

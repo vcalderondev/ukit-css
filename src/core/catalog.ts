@@ -264,8 +264,8 @@ export const SEMANTIC_TRAPS: Readonly<Record<string, string>> = {
   "fs-1": "a bare number in the font-size family is rem — fs-1 is font-size: 1rem.",
   "rounded-md": "8px here, not Tailwind's 6px. The named radius scale is xs(2) sm(4) md(8) lg(12) xl(16) 2xl(24) full(9999).",
   "lh-1-5": "the dash is a decimal point, so this is line-height: 1.5.",
-  "lh-4-5": "only 1, 2, 3, 4 and 1.5, 2.5, 3.5, 4.5 exist — there is no lh-1-25.",
-  "h-100vh": "viewport height works for h and w only. min-h and max-h accept pixels, so Tailwind's min-h-screen has no equivalent here.",
+  "lh-4-5": "the dash is a decimal point, so this is line-height: 4.5. The scale is 1–2 in steps of 0.1, then 2.5, 3, 3.5, 4, 4.5 — there is no lh-1-25.",
+  "h-100vh": "viewport units are written as a suffix and work for h/w plus the constraint helpers (min-h-100vh, max-h-60vh, max-w-100vw). There is no 'screen' keyword.",
   "border": "paints 1px solid var(--border); set --border to theme it.",
   "animate-spin": "the only family emitted without !important, so it stays overridable.",
 }

@@ -31,7 +31,7 @@ export function matchPosition(name: string): MatchResult | null {
   return decl("position", value, { category: 4 })
 }
 
-// Edge offsets: .top-0, .bottom-50-percent, .start-50, .end-0, etc.
+// Edge offsets: .top-0, .bottom-50-percent, .start-50, .end-0, .top-neg-5px.
 // Numeric offsets: .top-10px, .right-1-5-rem, etc.
 export function matchOffset(name: string): MatchResult | null {
   // Find which side prefix matches (avoid collisions: 'start' before 's', etc.)
@@ -44,27 +44,35 @@ export function matchOffset(name: string): MatchResult | null {
   }
   if (!side) return null
   if (name === side) return null // `.top` alone is not a class
-  const rest = name.slice(side.length + 1)
+  let rest = name.slice(side.length + 1)
   const prop = SIDE_TO_PROP[side]!
 
+  // Negative offsets mirror the letter-spacing convention: `.top-neg-5px`.
+  // Anchors stay positive — `neg-50-percent` would be a different feature.
+  let sign = ""
+  if (rest.startsWith("neg-")) {
+    sign = "-"
+    rest = rest.slice("neg-".length)
+  }
+
   // Anchored offsets: 0, 50-percent, 50
-  if (OFFSET_ANCHORS[rest] !== undefined) {
+  if (sign === "" && OFFSET_ANCHORS[rest] !== undefined) {
     return decl(prop, OFFSET_ANCHORS[rest]!, { category: 4 })
   }
   // Pixel offsets
   const px = rest.match(/^(\d+)px$/)
   if (px && PX_SET.has(px[1]!)) {
-    return decl(prop, `${px[1]}px`, { category: 4 })
+    return decl(prop, `${sign}${px[1]}px`, { category: 4 })
   }
   // Rem offsets: .top-0-5-rem, .left-1-rem
   const remM = rest.match(/^([\d-]+)-rem$/)
   if (remM && REM_SET.has(remM[1]!)) {
-    return decl(prop, `${dashToDot(remM[1]!)}rem`, { category: 4 })
+    return decl(prop, `${sign}${dashToDot(remM[1]!)}rem`, { category: 4 })
   }
   // Em offsets (not in original SASS but harmless to support)
   const emM = rest.match(/^([\d-]+)-em$/)
   if (emM && EM_SET.has(emM[1]!)) {
-    return decl(prop, `${dashToDot(emM[1]!)}em`, { category: 4 })
+    return decl(prop, `${sign}${dashToDot(emM[1]!)}em`, { category: 4 })
   }
   return null
 }

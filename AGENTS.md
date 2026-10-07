@@ -163,7 +163,7 @@ and reports git tags that belong to other package identities.
 
 <!-- BEGIN GENERATED:FAMILIES -->
 
-<!-- generated from src/core/grammar.ts — 4031 base utilities, 12092 with breakpoints -->
+<!-- generated from src/core/grammar.ts — 4703 base utilities, 14108 with breakpoints -->
 
 | Family | Stems | Examples |
 | --- | --- | --- |
@@ -173,11 +173,11 @@ and reports git tags that belong to other package identities.
 | Pointer events | `pointer-events-none` `pointer-events-auto` | `pointer-events-none` |
 | Display | `d-` | `d-flex`, `d-grid`, `d-none`, `d-none-m`, `d-block-i` |
 | Sizing — percentages | `w-` `h-` | `w-50`, `h-100`, `w-100-m` |
-| Sizing — fixed pixels | `w-` `h-` `max-w-` `min-w-` `max-h-` `min-h-` | `w-320px`, `h-64px`, `max-w-1200`, `min-h-100` |
+| Sizing — fixed pixels | `w-` `h-` `max-w-` `min-w-` `max-h-` `min-h-` | `w-320px`, `h-64px`, `max-w-1200`, `min-h-100vh`, `max-w-90-percent` |
 | Sizing — viewport | `w-` `h-` | `w-100vw`, `h-100vh`, `h-50vh` |
 | Sizing — intrinsic & auto | `w-max-content` `w-min-content` `w-fit-content` `h-max-content` `h-min-content` `h-fit-content` `w-auto` `h-auto` | `w-fit-content`, `h-auto`, `w-max-content` |
 | Position | `position-` | `position-relative`, `position-absolute`, `position-fixed` |
-| Offsets | `top-` `bottom-` `left-` `right-` `start-` `end-` | `top-0`, `left-50-percent`, `bottom-16px`, `start-50` |
+| Offsets | `top-` `bottom-` `left-` `right-` `start-` `end-` | `top-0`, `left-50-percent`, `bottom-16px`, `start-50`, `right-neg-5px` |
 | Transform helpers | `translate-x-center` `translate-x-neg-50` `translate-y-center` `translate-y-neg-50` `translate-center` `translate-middle` `transform-none` `rotate-90` | `translate-center`, `translate-x-center`, `rotate-90` |
 | Float | `float-` | `float-left`, `float-right` |
 | Clearfix | `clearfix` | `clearfix` |
@@ -189,16 +189,16 @@ and reports git tags that belong to other package identities.
 | Flex direction | `flex-direction-` | `flex-direction-column`, `flex-direction-row` |
 | Flex flow | `flex-flow-` | `flex-flow-row-wrap` |
 | Object fit | `object-` | `object-cover`, `object-contain` |
-| Z-index | `z-` | `z-1`, `z-50`, `z-9999` |
+| Z-index | `z-` | `z-1`, `z-50`, `z-200`, `z-9999` |
 | Overflow | `overflow-` `overflow-x-` `overflow-y-` | `overflow-hidden`, `overflow-x-auto` |
 | Opacity | `opacity-` | `opacity-0`, `opacity-50`, `opacity-100` |
 | Spacing — margin, padding, gap | `m-` `mt-` `mb-` `ml-` `mr-` `ms-` `me-` `mx-` `my-` `p-` `pt-` `pb-` `pl-` `pr-` `ps-` `pe-` `px-` `py-` `gap-` | `m-1-rem`, `pt-16px`, `mx-auto`, `gap-1-5-rem`, `p-2-5-rem-m` |
 | Font size | `fs-` | `fs-1-rem`, `fs-16px`, `fs-1-5-rem` |
 | Font weight | `fw-` | `fw-400`, `fw-700`, `fw-bold` |
 | Text align, transform & ellipsis | `text-` | `text-center`, `text-uppercase`, `text-ellipsis-3` |
-| Line height | `lh-` | `lh-1`, `lh-1-5` |
+| Line height | `lh-` | `lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` |
 | White space | `ws-` | `ws-nowrap`, `ws-pre-wrap` |
-| Letter spacing | `letter-spacing-` | `letter-spacing-1`, `letter-spacing-0-1-em`, `letter-spacing-neg-2` |
+| Letter spacing | `letter-spacing-` | `letter-spacing-1`, `letter-spacing-0-5px`, `letter-spacing-0-1-em`, `letter-spacing-neg-2` |
 | Border radius | `rounded-` `border-radius-` | `rounded-lg`, `rounded-full`, `rounded-r-12px` |
 | Borders | `border` `border-none` `border-transparent` `border-t` `border-b` `border-l` `border-r` `border-s` `border-e` `border-t-none` `border-b-none` `border-l-none` `border-r-none` `border-s-none` `border-e-none` | `border`, `border-t`, `border-none` |
 | Grid columns | `grid-cols-` | `grid-cols-3`, `grid-cols-1-m` |

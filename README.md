@@ -7,7 +7,7 @@ JIT utility-first CSS engine — Tailwind-style on-demand class generation for a
 ## Read this before you write a class name
 
 > **JIT affects which CSS is emitted. It does not make the class language open-ended.**
-> The vocabulary is finite, declared and fully enumerable: **4,031 base utilities, 12,092 including breakpoint variants**, all listed in [ukit.classes.txt](ukit.classes.txt).
+> The vocabulary is finite, declared and fully enumerable: **4,703 base utilities, 14,108 including breakpoint variants**, all listed in [ukit.classes.txt](ukit.classes.txt).
 
 Because the class language is fixed, ukit can offer everything a static library offers — autocompletion, typo detection, hover docs, editor integration — while still shipping only the CSS you use.
 
@@ -205,7 +205,7 @@ const strict: UkitClass = "d-flx"
 ```
 
 - `cn()` accepts the whole vocabulary for autocompletion **and** arbitrary strings, so runtime-composed class names keep working.
-- `UkitClass` is the strict union (4,031 base + 12,092 with `-m`/`-t`) when you want typos to be compile errors.
+- `UkitClass` is the strict union (4,703 base + 14,108 with `-m`/`-t`) when you want typos to be compile errors.
 - Also exported: `UkitClassName`, `UkitClassBase`, `UkitBreakpointSuffix` and one type per family (e.g. `UkitSpacing`, `UkitGridCols`).
 
 ### 2. VS Code extension
@@ -225,7 +225,7 @@ import { buildManifest, listClasses, explainClass, suggestClasses } from "@vcald
 | Artifact | Contents |
 | --- | --- |
 | [ukit.manifest.json](ukit.manifest.json) | Families, stems, every accepted value, CSS properties, breakpoint rules, Tailwind aliases. |
-| [ukit.classes.txt](ukit.classes.txt) | Flat list of all 12,092 valid class names. |
+| [ukit.classes.txt](ukit.classes.txt) | Flat list of all 14,108 valid class names. |
 | [AGENTS.md](AGENTS.md) | Instructions for coding agents working on this repo. |
 | [llms.txt](llms.txt) | Compact context file for LLMs. |
 | [docs/classes.md](docs/classes.md) | Full human-readable reference. |
@@ -295,7 +295,7 @@ Every utility ships with a base, `-m` (mobile, ≤ 576 px) and `-t` (tablet, 577
 
 Naming convention (spacing): `{prop}{dir?}-{value}[-{unit}][-{breakpoint}]`. Example: `pt-1-5-rem-m` → `padding-top: 1.5rem` on mobile.
 
-This table is a summary. The **complete** vocabulary — every stem and every accepted value, 4,031 base classes in 40 families — lives in [docs/classes.md](docs/classes.md), and as structured data in [ukit.manifest.json](ukit.manifest.json). It is generated from the same declaration the engine is tested against, so it cannot drift. To inspect one class:
+This table is a summary. The **complete** vocabulary — every stem and every accepted value, 4,703 base classes in 40 families — lives in [docs/classes.md](docs/classes.md), and as structured data in [ukit.manifest.json](ukit.manifest.json). It is generated from the same declaration the engine is tested against, so it cannot drift. To inspect one class:
 
 ```bash
 npx ukit-css explain pt-1-5-rem-m

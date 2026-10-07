@@ -22,8 +22,8 @@ Class names are **not** Tailwind names. The JIT part only affects which CSS is *
 | `fs-1` | a bare number in the font-size family is rem — fs-1 is font-size: 1rem. |
 | `rounded-md` | 8px here, not Tailwind's 6px. The named radius scale is xs(2) sm(4) md(8) lg(12) xl(16) 2xl(24) full(9999). |
 | `lh-1-5` | the dash is a decimal point, so this is line-height: 1.5. |
-| `lh-4-5` | only 1, 2, 3, 4 and 1.5, 2.5, 3.5, 4.5 exist — there is no lh-1-25. |
-| `h-100vh` | viewport height works for h and w only. min-h and max-h accept pixels, so Tailwind's min-h-screen has no equivalent here. |
+| `lh-4-5` | the dash is a decimal point, so this is line-height: 4.5. The scale is 1–2 in steps of 0.1, then 2.5, 3, 3.5, 4, 4.5 — there is no lh-1-25. |
+| `h-100vh` | viewport units are written as a suffix and work for h/w plus the constraint helpers (min-h-100vh, max-h-60vh, max-w-100vw). There is no 'screen' keyword. |
 | `border` | paints 1px solid var(--border); set --border to theme it. |
 | `animate-spin` | the only family emitted without !important, so it stays overridable. |
 
@@ -40,7 +40,7 @@ Class names are **not** Tailwind names. The JIT part only affects which CSS is *
 - Decimals become dashes: `1.5rem` -> `1-5-rem`
 - `px` attaches directly (`p-16px`); `rem`/`em`/`vh`/`vw` use a dash (`p-1-5-rem`)
 - Every utility except `animate-*` is emitted with `!important`
-- Vocabulary size: 4031 base utilities, 12092 with breakpoints
+- Vocabulary size: 4703 base utilities, 14108 with breakpoints
 - Known exception: `.border` has no `-t` (tablet) variant, because `.border-t` is already a different class.
 
 ## Families
@@ -53,11 +53,11 @@ Class names are **not** Tailwind names. The JIT part only affects which CSS is *
 | Pointer events | `pointer-events-none` `pointer-events-auto` | `pointer-events-none` |
 | Display | `d-` | `d-flex`, `d-grid`, `d-none`, `d-none-m`, `d-block-i` |
 | Sizing — percentages | `w-` `h-` | `w-50`, `h-100`, `w-100-m` |
-| Sizing — fixed pixels | `w-` `h-` `max-w-` `min-w-` `max-h-` `min-h-` | `w-320px`, `h-64px`, `max-w-1200`, `min-h-100` |
+| Sizing — fixed pixels | `w-` `h-` `max-w-` `min-w-` `max-h-` `min-h-` | `w-320px`, `h-64px`, `max-w-1200`, `min-h-100vh`, `max-w-90-percent` |
 | Sizing — viewport | `w-` `h-` | `w-100vw`, `h-100vh`, `h-50vh` |
 | Sizing — intrinsic & auto | `w-max-content` `w-min-content` `w-fit-content` `h-max-content` `h-min-content` `h-fit-content` `w-auto` `h-auto` | `w-fit-content`, `h-auto`, `w-max-content` |
 | Position | `position-` | `position-relative`, `position-absolute`, `position-fixed` |
-| Offsets | `top-` `bottom-` `left-` `right-` `start-` `end-` | `top-0`, `left-50-percent`, `bottom-16px`, `start-50` |
+| Offsets | `top-` `bottom-` `left-` `right-` `start-` `end-` | `top-0`, `left-50-percent`, `bottom-16px`, `start-50`, `right-neg-5px` |
 | Transform helpers | `translate-x-center` `translate-x-neg-50` `translate-y-center` `translate-y-neg-50` `translate-center` `translate-middle` `transform-none` `rotate-90` | `translate-center`, `translate-x-center`, `rotate-90` |
 | Float | `float-` | `float-left`, `float-right` |
 | Clearfix | `clearfix` | `clearfix` |
@@ -69,16 +69,16 @@ Class names are **not** Tailwind names. The JIT part only affects which CSS is *
 | Flex direction | `flex-direction-` | `flex-direction-column`, `flex-direction-row` |
 | Flex flow | `flex-flow-` | `flex-flow-row-wrap` |
 | Object fit | `object-` | `object-cover`, `object-contain` |
-| Z-index | `z-` | `z-1`, `z-50`, `z-9999` |
+| Z-index | `z-` | `z-1`, `z-50`, `z-200`, `z-9999` |
 | Overflow | `overflow-` `overflow-x-` `overflow-y-` | `overflow-hidden`, `overflow-x-auto` |
 | Opacity | `opacity-` | `opacity-0`, `opacity-50`, `opacity-100` |
 | Spacing — margin, padding, gap | `m-` `mt-` `mb-` `ml-` `mr-` `ms-` `me-` `mx-` `my-` `p-` `pt-` `pb-` `pl-` `pr-` `ps-` `pe-` `px-` `py-` `gap-` | `m-1-rem`, `pt-16px`, `mx-auto`, `gap-1-5-rem`, `p-2-5-rem-m` |
 | Font size | `fs-` | `fs-1-rem`, `fs-16px`, `fs-1-5-rem` |
 | Font weight | `fw-` | `fw-400`, `fw-700`, `fw-bold` |
 | Text align, transform & ellipsis | `text-` | `text-center`, `text-uppercase`, `text-ellipsis-3` |
-| Line height | `lh-` | `lh-1`, `lh-1-5` |
+| Line height | `lh-` | `lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` |
 | White space | `ws-` | `ws-nowrap`, `ws-pre-wrap` |
-| Letter spacing | `letter-spacing-` | `letter-spacing-1`, `letter-spacing-0-1-em`, `letter-spacing-neg-2` |
+| Letter spacing | `letter-spacing-` | `letter-spacing-1`, `letter-spacing-0-5px`, `letter-spacing-0-1-em`, `letter-spacing-neg-2` |
 | Border radius | `rounded-` `border-radius-` | `rounded-lg`, `rounded-full`, `rounded-r-12px` |
 | Borders | `border` `border-none` `border-transparent` `border-t` `border-b` `border-l` `border-r` `border-s` `border-e` `border-t-none` `border-b-none` `border-l-none` `border-r-none` `border-s-none` `border-e-none` | `border`, `border-t`, `border-none` |
 | Grid columns | `grid-cols-` | `grid-cols-3`, `grid-cols-1-m` |

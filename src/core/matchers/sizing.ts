@@ -84,6 +84,25 @@ export function matchFixedSize(name: string): MatchResult | null {
     if (px && FIXED_SIZE_SET.has(px[1]!)) {
       return decl(FIXED_PROP_MAP[prefix]!, `${px[1]}px`, { category: 3 })
     }
+    // Constraint helpers also accept percentages, the axis-appropriate
+    // viewport unit and `auto`: `.max-w-90-percent`, `.max-h-60vh`,
+    // `.min-h-auto`. Plain `w-`/`h-` deliberately keep their own matchers
+    // (`matchSizePercent` / `matchViewportSize`) so each class stays declared
+    // in exactly one grammar family.
+    if (FIXED_LEGACY_PROPS[prefix]) {
+      const unit = prefix.endsWith("w") ? "vw" : "vh"
+      const vp = rest.match(new RegExp(`^(\\d+)${unit}$`))
+      if (vp && VIEWPORT_SIZE_SET.has(vp[1]!)) {
+        return decl(FIXED_PROP_MAP[prefix]!, `${vp[1]}${unit}`, { category: 3 })
+      }
+      const pct = rest.match(/^(\d+)-percent$/)
+      if (pct && SIZE_PERCENT_SET.has(pct[1]!)) {
+        return decl(FIXED_PROP_MAP[prefix]!, `${pct[1]}%`, { category: 3 })
+      }
+      if (rest === "auto") {
+        return decl(FIXED_PROP_MAP[prefix]!, "auto", { category: 3 })
+      }
+    }
     // Legacy form (no px suffix) is only valid for min-/max- helpers.
     if (FIXED_LEGACY_PROPS[prefix] && /^\d+$/.test(rest) && FIXED_SIZE_SET.has(rest)) {
       return decl(FIXED_LEGACY_PROPS[prefix]!, `${rest}px`, { category: 3 })

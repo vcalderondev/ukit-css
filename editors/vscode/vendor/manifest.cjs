@@ -34,6 +34,7 @@ var PX_VALUES = [
   23,
   24,
   25,
+  28,
   30,
   32,
   35,
@@ -43,8 +44,10 @@ var PX_VALUES = [
   50,
   60,
   64,
+  68,
   80,
-  100
+  100,
+  110
 ];
 var EM_VALUES = [1, 1.5, 2];
 var VIEWPORT_SPACING = [5, 10, 15, 20, 25, 30, 40, 50];
@@ -60,7 +63,7 @@ var DISPLAYS = [
 ];
 var POSITIONS = ["relative", "absolute", "fixed", "sticky"];
 var SIZE_PERCENTS = [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100];
-var VIEWPORT_SIZES = [10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95, 100];
+var VIEWPORT_SIZES = [10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 85, 90, 95, 100];
 var COMMON_FIXED_SIZES = [
   80,
   100,
@@ -74,13 +77,17 @@ var COMMON_FIXED_SIZES = [
   300,
   320,
   360,
+  380,
   400,
   420,
   450,
   480,
   500,
   550,
+  560,
   600,
+  640,
+  650,
   700,
   750,
   800,
@@ -100,6 +107,7 @@ var OPACITIES = [
   30,
   40,
   50,
+  55,
   60,
   70,
   75,
@@ -127,6 +135,7 @@ var BORDER_RADIUS_PX = [
   0,
   1,
   2,
+  3,
   4,
   6,
   8,
@@ -158,6 +167,7 @@ var RADIUS_SIDES = {
   r: ["top-right", "bottom-right"]
 };
 var FS_PX_VALUES = [
+  6,
   8,
   9,
   10,
@@ -167,6 +177,7 @@ var FS_PX_VALUES = [
   14,
   15,
   16,
+  17,
   18,
   20,
   22,
@@ -182,10 +193,12 @@ var FS_PX_VALUES = [
   56,
   64,
   86,
-  108
+  108,
+  120
 ];
 var FS_REM_VALUES = [
   0.5,
+  0.55,
   0.6,
   0.65,
   0.7,
@@ -197,17 +210,21 @@ var FS_REM_VALUES = [
   0.9,
   0.95,
   1,
+  1.05,
   1.1,
+  1.15,
   1.2,
   1.25,
   1.3,
   1.4,
   1.5,
+  1.6,
   1.75,
   1.8,
   2,
   2.5,
   3,
+  3.5,
   4,
   5
 ];
@@ -235,7 +252,36 @@ var WHITE_SPACES = [
   "pre-line",
   "break-spaces"
 ];
-var LETTER_SPACING_EM = [0.01, 0.02, 0.05, 0.1, 0.15, 0.2];
+var LETTER_SPACING_EM = [0.01, 0.02, 0.05, 0.1, 0.12, 0.15, 0.2];
+var LETTER_SPACING_PX = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+var LINE_HEIGHTS = [
+  1,
+  1.05,
+  1.1,
+  1.15,
+  1.2,
+  1.25,
+  1.3,
+  1.35,
+  1.4,
+  1.45,
+  1.5,
+  1.55,
+  1.6,
+  1.65,
+  1.7,
+  1.75,
+  1.8,
+  1.85,
+  1.9,
+  1.95,
+  2,
+  2.5,
+  3,
+  3.5,
+  4,
+  4.5
+];
 var ALIGN_VALUES = {
   center: "center",
   start: "flex-start",
@@ -271,7 +317,7 @@ var FLEX_FLOW_VALUES = [
   "wrap",
   "wrap-reverse"
 ];
-var Z_EXTREME = [500, 1e3, 2e3, 5e3, 9999, 1e4];
+var Z_EXTREME = [200, 500, 1e3, 2e3, 3e3, 5e3, 9999, 1e4];
 var SIDES = ["top", "bottom", "left", "right", "start", "end"];
 var SIDE_TO_PROP = {
   top: "top",
@@ -335,6 +381,8 @@ var VIEWPORT_SPACING_SET = toSet(VIEWPORT_SPACING);
 var BORDER_RADIUS_PX_SET = toSet(BORDER_RADIUS_PX);
 var Z_EXTREME_SET = toSet(Z_EXTREME);
 var LETTER_SPACING_EM_SET = toSet(LETTER_SPACING_EM.map(dasherize));
+var LETTER_SPACING_PX_SET = toSet(LETTER_SPACING_PX.map(dasherize));
+var LINE_HEIGHT_SET = toSet(LINE_HEIGHTS.map(dasherize));
 
 // src/core/matchers/helpers.ts
 var dashToDot = (s) => s.replace(/-/g, ".");
@@ -411,6 +459,20 @@ function matchFixedSize(name) {
     if (px && FIXED_SIZE_SET.has(px[1])) {
       return decl(FIXED_PROP_MAP[prefix], `${px[1]}px`, { category: 3 });
     }
+    if (FIXED_LEGACY_PROPS[prefix]) {
+      const unit = prefix.endsWith("w") ? "vw" : "vh";
+      const vp = rest.match(new RegExp(`^(\\d+)${unit}$`));
+      if (vp && VIEWPORT_SIZE_SET.has(vp[1])) {
+        return decl(FIXED_PROP_MAP[prefix], `${vp[1]}${unit}`, { category: 3 });
+      }
+      const pct = rest.match(/^(\d+)-percent$/);
+      if (pct && SIZE_PERCENT_SET.has(pct[1])) {
+        return decl(FIXED_PROP_MAP[prefix], `${pct[1]}%`, { category: 3 });
+      }
+      if (rest === "auto") {
+        return decl(FIXED_PROP_MAP[prefix], "auto", { category: 3 });
+      }
+    }
     if (FIXED_LEGACY_PROPS[prefix] && /^\d+$/.test(rest) && FIXED_SIZE_SET.has(rest)) {
       return decl(FIXED_LEGACY_PROPS[prefix], `${rest}px`, { category: 3 });
     }
@@ -480,12 +542,13 @@ var FS_VALUES = [
 ];
 var LETTER_SPACING_VALUES = [
   ...range(1, 10).map(String),
-  ...range(1, 10).map((n) => `${n}px`),
+  ...LETTER_SPACING_PX.map(dasherize).map((v) => `${v}px`),
   ...range(1, 10).map((n) => `neg-${n}`),
-  ...range(1, 10).map((n) => `neg-${n}px`),
+  ...LETTER_SPACING_PX.map(dasherize).map((v) => `neg-${v}px`),
   ...LETTER_SPACING_EM.map(dasherize).map((v) => `${v}-em`),
   ...LETTER_SPACING_EM.map(dasherize).map((v) => `neg-${v}-em`)
 ];
+var LINE_HEIGHT_VALUES = LINE_HEIGHTS.map(dasherize);
 var Z_VALUES = [
   ...range(1, 10),
   ...range(1, 10).map((n) => n * 10),
@@ -495,7 +558,10 @@ var OFFSET_VALUES = [
   ...Object.keys(OFFSET_ANCHORS),
   ...strings(PX_VALUES).map((n) => `${n}px`),
   ...REM_DASHED.map((v) => `${v}-rem`),
-  ...EM_DASHED.map((v) => `${v}-em`)
+  ...EM_DASHED.map((v) => `${v}-em`),
+  ...strings(PX_VALUES).map((n) => `neg-${n}px`),
+  ...REM_DASHED.map((v) => `neg-${v}-rem`),
+  ...EM_DASHED.map((v) => `neg-${v}-em`)
 ];
 var SPACING_DIRECTIONS = [
   "m",
@@ -540,6 +606,10 @@ var SPACING_TARGETS = {
 };
 var SIZING_FIXED_PX = [...FIXED_SIZES].map((n) => `${n}px`);
 var SIZING_LEGACY = [...FIXED_SIZES].map(String);
+var SIZING_VIEWPORT_VW = strings(VIEWPORT_SIZES).map((n) => `${n}vw`);
+var SIZING_VIEWPORT_VH = strings(VIEWPORT_SIZES).map((n) => `${n}vh`);
+var SIZING_PERCENT = strings(SIZE_PERCENTS).map((n) => `${n}-percent`);
+var SIZING_AUTO = ["auto"];
 var FAMILIES = [
   {
     id: "background",
@@ -607,18 +677,35 @@ var FAMILIES = [
   {
     id: "sizing-fixed",
     title: "Sizing \u2014 fixed pixels",
-    summary: "Pixel width/height and min/max constraints: `w-320px`, `max-w-1200`.",
+    summary: "Pixel width/height and min/max constraints: `w-320px`, `max-w-1200`, `min-h-100vh`, `max-w-90-percent`.",
     matchers: ["matchFixedSize"],
     stems: [
       stem("w", SIZING_FIXED_PX, "width"),
       stem("h", SIZING_FIXED_PX, "height"),
-      stem("max-w", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "max-width"),
-      stem("min-w", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "min-width"),
-      stem("max-h", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "max-height"),
-      stem("min-h", [...SIZING_FIXED_PX, ...SIZING_LEGACY], "min-height")
+      stem(
+        "max-w",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VW, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "max-width"
+      ),
+      stem(
+        "min-w",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VW, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "min-width"
+      ),
+      stem(
+        "max-h",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VH, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "max-height"
+      ),
+      stem(
+        "min-h",
+        [...SIZING_FIXED_PX, ...SIZING_LEGACY, ...SIZING_VIEWPORT_VH, ...SIZING_PERCENT, ...SIZING_AUTO],
+        "min-height"
+      )
     ],
     cssProperties: ["width", "height", "max-width", "min-width", "max-height", "min-height"],
-    examples: ["w-320px", "h-64px", "max-w-1200", "min-h-100"]
+    examples: ["w-320px", "h-64px", "max-w-1200", "min-h-100vh", "max-w-90-percent"],
+    docs: "The `min-`/`max-` helpers also accept the axis-appropriate viewport unit (`min-h-100vh`, `max-w-100vw`), percentages (`max-w-90-percent`), `auto` (`min-h-auto`) and a legacy bare-pixel form (`max-w-1200`)."
   },
   {
     id: "sizing-viewport",
@@ -663,12 +750,12 @@ var FAMILIES = [
   {
     id: "offset",
     title: "Offsets",
-    summary: "Edge offsets in px/rem/em or anchors: `top-0`, `left-50-percent`, `top-16px`, `right-1-5-rem`.",
+    summary: "Edge offsets in px/rem/em or anchors: `top-0`, `left-50-percent`, `top-16px`, `right-1-5-rem`, `bottom-neg-5px`.",
     matchers: ["matchOffset"],
     stems: SIDES.map((side) => stem(side, OFFSET_VALUES, side)),
     cssProperties: ["top", "bottom", "left", "right"],
-    examples: ["top-0", "left-50-percent", "bottom-16px", "start-50"],
-    docs: "`start` maps to `left` and `end` maps to `right`, mirroring the logical-side helpers."
+    examples: ["top-0", "left-50-percent", "bottom-16px", "start-50", "right-neg-5px"],
+    docs: "`start` maps to `left` and `end` maps to `right`, mirroring the logical-side helpers. Numeric offsets take a `neg-` prefix for negative values (`top-neg-8px`); the anchors `0`, `50` and `50-percent` are always positive."
   },
   {
     id: "transform",
@@ -784,11 +871,11 @@ var FAMILIES = [
   {
     id: "z-index",
     title: "Z-index",
-    summary: "Stacking order: `z-1`\u2026`z-10`, decades up to `z-100`, plus presets like `z-9999`.",
+    summary: "Stacking order: `z-1`\u2026`z-10`, decades up to `z-100`, plus presets like `z-200`, `z-3000`, `z-9999`.",
     matchers: ["matchZIndex"],
     stems: [stem("z", Z_VALUES, "z-index")],
     cssProperties: ["z-index"],
-    examples: ["z-1", "z-50", "z-9999"]
+    examples: ["z-1", "z-50", "z-200", "z-9999"]
   },
   {
     id: "overflow",
@@ -864,11 +951,12 @@ var FAMILIES = [
   {
     id: "line-height",
     title: "Line height",
-    summary: "`lh-1`, `lh-1-5`, `lh-2`.",
+    summary: "`lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` \u2014 the dash is the decimal point.",
     matchers: ["matchLineHeight"],
-    stems: [stem("lh", [...range(1, 4).map(String), ...range(1, 4).map((n) => `${n}-5`)], "line-height")],
+    stems: [stem("lh", LINE_HEIGHT_VALUES, "line-height")],
     cssProperties: ["line-height"],
-    examples: ["lh-1", "lh-1-5"]
+    examples: ["lh-1", "lh-1-2", "lh-1-5", "lh-4-5"],
+    docs: "`1`\u2013`2` in steps of `0.1`, then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size."
   },
   {
     id: "white-space",
@@ -882,11 +970,12 @@ var FAMILIES = [
   {
     id: "letter-spacing",
     title: "Letter spacing",
-    summary: "`letter-spacing-1`, `letter-spacing-0-1-em`, `letter-spacing-neg-1`.",
+    summary: "`letter-spacing-1`, `letter-spacing-0-5px`, `letter-spacing-0-1-em`, `letter-spacing-neg-1`.",
     matchers: ["matchLetterSpacing"],
     stems: [stem("letter-spacing", LETTER_SPACING_VALUES, "letter-spacing")],
     cssProperties: ["letter-spacing"],
-    examples: ["letter-spacing-1", "letter-spacing-0-1-em", "letter-spacing-neg-2"]
+    examples: ["letter-spacing-1", "letter-spacing-0-5px", "letter-spacing-0-1-em", "letter-spacing-neg-2"],
+    docs: "Pixel values accept the fractional `0-5` step (`letter-spacing-0-5px`); `em` values are relative to the element's font size. Every numeric form also has a `neg-` counterpart."
   },
   // --- Borders ---------------------------------------------------------------
   {
@@ -1046,22 +1135,27 @@ function matchOffset(name) {
   }
   if (!side) return null;
   if (name === side) return null;
-  const rest = name.slice(side.length + 1);
+  let rest = name.slice(side.length + 1);
   const prop = SIDE_TO_PROP[side];
-  if (OFFSET_ANCHORS[rest] !== void 0) {
+  let sign = "";
+  if (rest.startsWith("neg-")) {
+    sign = "-";
+    rest = rest.slice("neg-".length);
+  }
+  if (sign === "" && OFFSET_ANCHORS[rest] !== void 0) {
     return decl(prop, OFFSET_ANCHORS[rest], { category: 4 });
   }
   const px = rest.match(/^(\d+)px$/);
   if (px && PX_SET.has(px[1])) {
-    return decl(prop, `${px[1]}px`, { category: 4 });
+    return decl(prop, `${sign}${px[1]}px`, { category: 4 });
   }
   const remM = rest.match(/^([\d-]+)-rem$/);
   if (remM && REM_SET.has(remM[1])) {
-    return decl(prop, `${dashToDot(remM[1])}rem`, { category: 4 });
+    return decl(prop, `${sign}${dashToDot(remM[1])}rem`, { category: 4 });
   }
   const emM = rest.match(/^([\d-]+)-em$/);
   if (emM && EM_SET.has(emM[1])) {
-    return decl(prop, `${dashToDot(emM[1])}em`, { category: 4 });
+    return decl(prop, `${sign}${dashToDot(emM[1])}em`, { category: 4 });
   }
   return null;
 }
@@ -1348,14 +1442,8 @@ function matchText(name) {
 function matchLineHeight(name) {
   if (!name.startsWith("lh-")) return null;
   const rest = name.slice(3);
-  if (/^[1-4]$/.test(rest)) {
-    return decl("line-height", rest, { category: 8 });
-  }
-  const half = rest.match(/^([1-4])-5$/);
-  if (half) {
-    return decl("line-height", `${half[1]}.5`, { category: 8 });
-  }
-  return null;
+  if (!LINE_HEIGHT_SET.has(rest)) return null;
+  return decl("line-height", dashToDot(rest), { category: 8 });
 }
 function matchWhiteSpace(name) {
   if (!name.startsWith("ws-")) return null;
@@ -1369,12 +1457,9 @@ function matchLetterSpacing(name) {
   const negative = rest.startsWith("neg-");
   const body = negative ? rest.slice("neg-".length) : rest;
   const sign = negative ? "-" : "";
-  const px = body.match(/^(\d+)px$/);
-  if (px) {
-    const n = Number(px[1]);
-    if (n >= 1 && n <= 10) {
-      return decl("letter-spacing", `${sign}${n}px`, { category: 8 });
-    }
+  const px = body.match(/^([\d-]+)px$/);
+  if (px && LETTER_SPACING_PX_SET.has(px[1])) {
+    return decl("letter-spacing", `${sign}${dashToDot(px[1])}px`, { category: 8 });
   }
   if (/^\d+$/.test(body)) {
     const n = Number(body);
@@ -1750,8 +1835,8 @@ var SEMANTIC_TRAPS = {
   "fs-1": "a bare number in the font-size family is rem \u2014 fs-1 is font-size: 1rem.",
   "rounded-md": "8px here, not Tailwind's 6px. The named radius scale is xs(2) sm(4) md(8) lg(12) xl(16) 2xl(24) full(9999).",
   "lh-1-5": "the dash is a decimal point, so this is line-height: 1.5.",
-  "lh-4-5": "only 1, 2, 3, 4 and 1.5, 2.5, 3.5, 4.5 exist \u2014 there is no lh-1-25.",
-  "h-100vh": "viewport height works for h and w only. min-h and max-h accept pixels, so Tailwind's min-h-screen has no equivalent here.",
+  "lh-4-5": "the dash is a decimal point, so this is line-height: 4.5. The scale is 1\u20132 in steps of 0.1, then 2.5, 3, 3.5, 4, 4.5 \u2014 there is no lh-1-25.",
+  "h-100vh": "viewport units are written as a suffix and work for h/w plus the constraint helpers (min-h-100vh, max-h-60vh, max-w-100vw). There is no 'screen' keyword.",
   "border": "paints 1px solid var(--border); set --border to theme it.",
   "animate-spin": "the only family emitted without !important, so it stays overridable."
 };
@@ -1874,7 +1959,7 @@ function shadowedSuffixes() {
 }
 
 // src/core/version.ts
-var VERSION = "1.1.1";
+var VERSION = "1.2.0";
 
 // src/manifest.ts
 var MANIFEST_SCHEMA_VERSION = 1;

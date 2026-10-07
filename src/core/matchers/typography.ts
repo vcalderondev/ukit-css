@@ -12,6 +12,8 @@ import {
   FS_PX_SET,
   FS_REM_SET,
   LETTER_SPACING_EM_SET,
+  LETTER_SPACING_PX_SET,
+  LINE_HEIGHT_SET,
   TEXT_ALIGNS,
   TEXT_TRANSFORMS,
   WHITE_SPACES,
@@ -92,18 +94,12 @@ export function matchText(name: string): MatchResult | null {
   return null
 }
 
-// .lh-{1-4}, .lh-{1-4}-5
+// .lh-{value} where value is a dasherized decimal (`.lh-1`, `.lh-1-5`, `.lh-1-2`).
 export function matchLineHeight(name: string): MatchResult | null {
   if (!name.startsWith("lh-")) return null
   const rest = name.slice(3)
-  if (/^[1-4]$/.test(rest)) {
-    return decl("line-height", rest, { category: 8 })
-  }
-  const half = rest.match(/^([1-4])-5$/)
-  if (half) {
-    return decl("line-height", `${half[1]}.5`, { category: 8 })
-  }
-  return null
+  if (!LINE_HEIGHT_SET.has(rest)) return null
+  return decl("line-height", dashToDot(rest), { category: 8 })
 }
 
 // .ws-{value}
@@ -124,13 +120,10 @@ export function matchLetterSpacing(name: string): MatchResult | null {
   const body = negative ? rest.slice("neg-".length) : rest
   const sign = negative ? "-" : ""
 
-  // px (with suffix)
-  const px = body.match(/^(\d+)px$/)
-  if (px) {
-    const n = Number(px[1])
-    if (n >= 1 && n <= 10) {
-      return decl("letter-spacing", `${sign}${n}px`, { category: 8 })
-    }
+  // px (with suffix), including the fractional 0-5 step
+  const px = body.match(/^([\d-]+)px$/)
+  if (px && LETTER_SPACING_PX_SET.has(px[1]!)) {
+    return decl("letter-spacing", `${sign}${dashToDot(px[1]!)}px`, { category: 8 })
   }
   // Legacy: bare integer 1-10 → px
   if (/^\d+$/.test(body)) {
