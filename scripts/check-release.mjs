@@ -90,6 +90,10 @@ const tagList = (git(["tag", "-l"]) ?? "").split("\n").filter(Boolean)
 
 const foreign = []
 for (const tag of tagList) {
+  // Tags namespaced under `legacy/` are preserved history from an earlier
+  // package identity. They are deliberately kept out of the version space
+  // (which is the whole point of the prefix), so they are not a problem.
+  if (tag.startsWith("legacy/")) continue
   const raw = git(["show", `${tag}:package.json`])
   if (!raw) continue
   try {
