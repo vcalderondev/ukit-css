@@ -5,7 +5,7 @@
 // Source of truth: src/core/grammar.ts (validated against the real matchers by
 // test/catalog.test.mjs, in both directions).
 //
-// Base utilities: 4703 · including -m/-t: 14108
+// Base utilities: 4726 · including -m/-t: 14177
 // =============================================================================
 /** `background` classes that take no value. */
 export type UkitBackgroundBare = "bg-transparent" | "bg-none"
@@ -44,6 +44,15 @@ export type UkitPointerEventsBare = "pointer-events-none" | "pointer-events-auto
 
 /** Pointer events — Enables or disables pointer interaction. */
 export type UkitPointerEvents = UkitPointerEventsBare
+
+/** Values accepted after `user-select-`. */
+export type UkitUserSelectValues = "none" | "text" | "all" | "auto" | "contain"
+
+/** `user-select-*` — user-select */
+export type UkitUserSelectUserSelect = `user-select-${UkitUserSelectValues}`
+
+/** User select — Controls text selection: `user-select-none`, `user-select-text`. */
+export type UkitUserSelect = UkitUserSelectUserSelect
 
 /** Values accepted after `d-`. */
 export type UkitDisplayValues =
@@ -1326,6 +1335,15 @@ export type UkitSpacing =
   | UkitSpacingGap
   | UkitSpacingBare
 
+/** Values accepted after `font-family-`. */
+export type UkitFontFamilyValues = "sans" | "serif" | "mono"
+
+/** `font-family-*` — font-family */
+export type UkitFontFamilyFontFamily = `font-family-${UkitFontFamilyValues}`
+
+/** Font family — Generic font stacks: `font-family-mono`, `font-family-sans`, `font-family-serif`. */
+export type UkitFontFamily = UkitFontFamilyFontFamily
+
 /** Values accepted after `fs-`. */
 export type UkitFontSizeValues =
   | "6px"
@@ -1474,6 +1492,39 @@ export type UkitTextBare =
 
 /** Text align, transform & ellipsis — `text-center`, `text-uppercase`, `text-ellipsis` (single line) and `text-ellipsis-3` (clamp). */
 export type UkitText = UkitTextText | UkitTextBare
+
+/** Values accepted after `text-decoration-`. */
+export type UkitTextDecorationValues = "none" | "underline" | "overline" | "line-through"
+
+/** `text-decoration-*` — text-decoration */
+export type UkitTextDecorationTextDecoration = `text-decoration-${UkitTextDecorationValues}`
+
+/** Text decoration — `text-decoration-none`, `text-decoration-underline`, `text-decoration-line-through`. */
+export type UkitTextDecoration = UkitTextDecorationTextDecoration
+
+/** Values accepted after `list-style-`. */
+export type UkitListStyleValues =
+  | "none"
+  | "disc"
+  | "circle"
+  | "square"
+  | "decimal"
+  | "lower-alpha"
+  | "upper-alpha"
+  | "lower-roman"
+  | "upper-roman"
+
+/** `list-style-*` — list-style-type */
+export type UkitListStyleListStyle = `list-style-${UkitListStyleValues}`
+
+/** Values accepted after `list-style-position-`. */
+export type UkitListStyleListStylePositionValues = "inside" | "outside"
+
+/** `list-style-position-*` — list-style-position */
+export type UkitListStyleListStylePosition = `list-style-position-${UkitListStyleListStylePositionValues}`
+
+/** List style — `list-style-none`, `list-style-disc`, `list-style-position-inside`. */
+export type UkitListStyle = UkitListStyleListStyle | UkitListStyleListStylePosition
 
 /** Values accepted after `lh-`. */
 export type UkitLineHeightValues =
@@ -1799,6 +1850,7 @@ export type UkitClassBase =
   | UkitCursor
   | UkitOutline
   | UkitPointerEvents
+  | UkitUserSelect
   | UkitDisplay
   | UkitSizingPercent
   | UkitSizingFixed
@@ -1821,9 +1873,12 @@ export type UkitClassBase =
   | UkitOverflow
   | UkitOpacity
   | UkitSpacing
+  | UkitFontFamily
   | UkitFontSize
   | UkitFontWeight
   | UkitText
+  | UkitTextDecoration
+  | UkitListStyle
   | UkitLineHeight
   | UkitWhiteSpace
   | UkitLetterSpacing

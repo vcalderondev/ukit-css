@@ -83,6 +83,37 @@ export const CURSORS = [
 
 export const OBJECT_FITS = ["cover", "contain", "fill", "none", "scale-down"] as const
 
+export const USER_SELECTS = ["none", "text", "all", "auto", "contain"] as const
+
+export const TEXT_DECORATIONS = ["none", "underline", "overline", "line-through"] as const
+
+export const LIST_STYLE_TYPES = [
+  "none",
+  "disc",
+  "circle",
+  "square",
+  "decimal",
+  "lower-alpha",
+  "upper-alpha",
+  "lower-roman",
+  "upper-roman",
+] as const
+
+export const LIST_STYLE_POSITIONS = ["inside", "outside"] as const
+
+/**
+ * Font-family utilities.
+ *
+ * Values are CSS-variable backed, mirroring how `.border` reads `--border`: a
+ * project can theme them, and the generic stack in the fallback keeps the
+ * utility meaningful before any variable is declared.
+ */
+export const FONT_FAMILIES: Record<string, string> = {
+  sans: "var(--font-sans, system-ui, -apple-system, 'Segoe UI', sans-serif)",
+  serif: "var(--font-serif, Georgia, 'Times New Roman', serif)",
+  mono: "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace)",
+}
+
 // -----------------------------------------------------------------------------
 // Border radius
 // -----------------------------------------------------------------------------

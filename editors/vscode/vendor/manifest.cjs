@@ -131,6 +131,25 @@ var CURSORS = [
   "zoom-out"
 ];
 var OBJECT_FITS = ["cover", "contain", "fill", "none", "scale-down"];
+var USER_SELECTS = ["none", "text", "all", "auto", "contain"];
+var TEXT_DECORATIONS = ["none", "underline", "overline", "line-through"];
+var LIST_STYLE_TYPES = [
+  "none",
+  "disc",
+  "circle",
+  "square",
+  "decimal",
+  "lower-alpha",
+  "upper-alpha",
+  "lower-roman",
+  "upper-roman"
+];
+var LIST_STYLE_POSITIONS = ["inside", "outside"];
+var FONT_FAMILIES = {
+  sans: "var(--font-sans, system-ui, -apple-system, 'Segoe UI', sans-serif)",
+  serif: "var(--font-serif, Georgia, 'Times New Roman', serif)",
+  mono: "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace)"
+};
 var BORDER_RADIUS_PX = [
   0,
   1,
@@ -647,6 +666,15 @@ var FAMILIES = [
     cssProperties: ["pointer-events"],
     examples: ["pointer-events-none"]
   },
+  {
+    id: "user-select",
+    title: "User select",
+    summary: "Controls text selection: `user-select-none`, `user-select-text`.",
+    matchers: ["matchUserSelect"],
+    stems: [stem("user-select", USER_SELECTS, "user-select")],
+    cssProperties: ["user-select"],
+    examples: ["user-select-none", "user-select-text", "user-select-all"]
+  },
   // --- Display ---------------------------------------------------------------
   {
     id: "display",
@@ -921,6 +949,16 @@ var FAMILIES = [
   },
   // --- Typography ------------------------------------------------------------
   {
+    id: "font-family",
+    title: "Font family",
+    summary: "Generic font stacks: `font-family-mono`, `font-family-sans`, `font-family-serif`.",
+    matchers: ["matchFontFamily"],
+    stems: [stem("font-family", Object.keys(FONT_FAMILIES), "font-family")],
+    cssProperties: ["font-family"],
+    examples: ["font-family-mono", "font-family-sans"],
+    docs: "Each value reads a CSS variable first and falls back to a generic stack \u2014 `font-family-mono` is `var(--font-mono, ui-monospace, \u2026)`. Theme the stack by defining `--font-mono`, `--font-sans` or `--font-serif`. There is no family for project-specific faces; declare those in your own stylesheet."
+  },
+  {
     id: "font-size",
     title: "Font size",
     summary: "`fs-1-5-rem`, `fs-16px`, `fs-2-em`.",
@@ -949,6 +987,28 @@ var FAMILIES = [
     examples: ["text-center", "text-uppercase", "text-ellipsis-3"]
   },
   {
+    id: "text-decoration",
+    title: "Text decoration",
+    summary: "`text-decoration-none`, `text-decoration-underline`, `text-decoration-line-through`.",
+    matchers: ["matchTextDecoration"],
+    stems: [stem("text-decoration", TEXT_DECORATIONS, "text-decoration")],
+    cssProperties: ["text-decoration"],
+    examples: ["text-decoration-none", "text-decoration-underline"]
+  },
+  {
+    id: "list-style",
+    title: "List style",
+    summary: "`list-style-none`, `list-style-disc`, `list-style-position-inside`.",
+    matchers: ["matchListStyle"],
+    stems: [
+      stem("list-style", LIST_STYLE_TYPES, "list-style-type"),
+      stem("list-style-position", LIST_STYLE_POSITIONS, "list-style-position")
+    ],
+    cssProperties: ["list-style-type", "list-style-position"],
+    examples: ["list-style-none", "list-style-disc", "list-style-position-inside"],
+    docs: "`list-style-*` writes `list-style-type`; the marker position is the separate `list-style-position-*` stem."
+  },
+  {
     id: "line-height",
     title: "Line height",
     summary: "`lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` \u2014 the dash is the decimal point.",
@@ -956,7 +1016,7 @@ var FAMILIES = [
     stems: [stem("lh", LINE_HEIGHT_VALUES, "line-height")],
     cssProperties: ["line-height"],
     examples: ["lh-1", "lh-1-2", "lh-1-5", "lh-4-5"],
-    docs: "`1`\u2013`2` in steps of `0.1`, then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size."
+    docs: "`1`\u2013`2` in steps of `0.05` (so `lh-1-45` is `1.45`), then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size."
   },
   {
     id: "white-space",
@@ -1083,6 +1143,7 @@ function enumerateFamily(family) {
 
 // src/core/matchers/base.ts
 var CURSOR_SET = new Set(CURSORS);
+var USER_SELECT_SET = new Set(USER_SELECTS);
 function matchBackground(name) {
   if (name === "bg-transparent") return decl("background", "transparent", { category: 1 });
   if (name === "bg-none") return decl("background", "none", { category: 1 });
@@ -1102,6 +1163,12 @@ function matchPointerEvents(name) {
   if (name === "pointer-events-none") return decl("pointer-events", "none", { category: 1 });
   if (name === "pointer-events-auto") return decl("pointer-events", "auto", { category: 1 });
   return null;
+}
+function matchUserSelect(name) {
+  if (!name.startsWith("user-select-")) return null;
+  const value = name.slice("user-select-".length);
+  if (!USER_SELECT_SET.has(value)) return null;
+  return decl("user-select", value, { category: 1 });
 }
 
 // src/core/matchers/display.ts
@@ -1380,6 +1447,32 @@ function matchSpacing(name) {
 var TEXT_ALIGN_SET = new Set(TEXT_ALIGNS);
 var TEXT_TRANSFORM_SET = new Set(TEXT_TRANSFORMS);
 var WHITE_SPACE_SET = new Set(WHITE_SPACES);
+var TEXT_DECORATION_SET = new Set(TEXT_DECORATIONS);
+var LIST_STYLE_TYPE_SET = new Set(LIST_STYLE_TYPES);
+var LIST_STYLE_POSITION_SET = new Set(LIST_STYLE_POSITIONS);
+function matchFontFamily(name) {
+  if (!name.startsWith("font-family-")) return null;
+  const stack = FONT_FAMILIES[name.slice("font-family-".length)];
+  if (stack === void 0) return null;
+  return decl("font-family", stack, { category: 8 });
+}
+function matchTextDecoration(name) {
+  if (!name.startsWith("text-decoration-")) return null;
+  const value = name.slice("text-decoration-".length);
+  if (!TEXT_DECORATION_SET.has(value)) return null;
+  return decl("text-decoration", value, { category: 8 });
+}
+function matchListStyle(name) {
+  if (name.startsWith("list-style-position-")) {
+    const value2 = name.slice("list-style-position-".length);
+    if (!LIST_STYLE_POSITION_SET.has(value2)) return null;
+    return decl("list-style-position", value2, { category: 8 });
+  }
+  if (!name.startsWith("list-style-")) return null;
+  const value = name.slice("list-style-".length);
+  if (!LIST_STYLE_TYPE_SET.has(value)) return null;
+  return decl("list-style-type", value, { category: 8 });
+}
 function matchFontSize(name) {
   if (!name.startsWith("fs-")) return null;
   const rest = name.slice(3);
@@ -1593,6 +1686,7 @@ var MATCHERS = [
   matchCursor,
   matchOutlineNone,
   matchPointerEvents,
+  matchUserSelect,
   // --- Display ---
   matchDisplay,
   // --- Sizing (specific before generic) ---
@@ -1635,8 +1729,13 @@ var MATCHERS = [
   // letter-spacing-* before text-* (no overlap, but order keeps it tidy)
   matchFontSize,
   matchFontWeight,
+  matchFontFamily,
   matchLineHeight,
   matchWhiteSpace,
+  matchListStyle,
+  // list-style-position-* before list-style-*
+  matchTextDecoration,
+  // text-decoration-* before text-*
   matchText,
   // text-{align|transform|ellipsis|ellipsis-N}
   // --- Borders (radius BEFORE border) ---
@@ -1825,7 +1924,15 @@ var TAILWIND_ALIASES = {
   "translate-y-1/2": ["translate-y-center"],
   "col-span-2": ["grid-col-span-2"],
   "row-span-2": ["grid-row-span-2"],
-  "sr-only": ["text-ellipsis"]
+  "sr-only": ["text-ellipsis"],
+  "select-none": ["user-select-none"],
+  "select-text": ["user-select-text"],
+  "select-all": ["user-select-all"],
+  "no-underline": ["text-decoration-none"],
+  "line-through": ["text-decoration-line-through"],
+  "list-none": ["list-style-none"],
+  "list-disc": ["list-style-disc"],
+  "list-decimal": ["list-style-decimal"]
 };
 var SEMANTIC_TRAPS = {
   "p-4": "a bare number in the spacing family means px (after em), not rem \u2014 so p-4 is padding: 4px. Use p-1-rem for 1rem.",
@@ -1959,7 +2066,7 @@ function shadowedSuffixes() {
 }
 
 // src/core/version.ts
-var VERSION = "1.2.0";
+var VERSION = "1.3.0";
 
 // src/manifest.ts
 var MANIFEST_SCHEMA_VERSION = 1;

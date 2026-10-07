@@ -247,6 +247,14 @@ export const TAILWIND_ALIASES: Readonly<Record<string, readonly string[]>> = {
   "col-span-2": ["grid-col-span-2"],
   "row-span-2": ["grid-row-span-2"],
   "sr-only": ["text-ellipsis"],
+  "select-none": ["user-select-none"],
+  "select-text": ["user-select-text"],
+  "select-all": ["user-select-all"],
+  "no-underline": ["text-decoration-none"],
+  "line-through": ["text-decoration-line-through"],
+  "list-none": ["list-style-none"],
+  "list-disc": ["list-style-disc"],
+  "list-decimal": ["list-style-decimal"],
 }
 
 /**

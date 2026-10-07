@@ -41,6 +41,7 @@ import {
   FLEX_FLOW_VALUES,
   FLEX_WRAPS,
   FLOAT_VALUES,
+  FONT_FAMILIES,
   FONT_WEIGHTS,
   FS_EM_VALUES,
   FS_PX_VALUES,
@@ -50,6 +51,8 @@ import {
   LETTER_SPACING_EM,
   LETTER_SPACING_PX,
   LINE_HEIGHTS,
+  LIST_STYLE_POSITIONS,
+  LIST_STYLE_TYPES,
   OBJECT_FITS,
   OFFSET_ANCHORS,
   OPACITIES,
@@ -61,8 +64,10 @@ import {
   SIZE_PERCENTS,
   SIDES,
   TEXT_ALIGNS,
+  TEXT_DECORATIONS,
   TEXT_TRANSFORMS,
   TRANSFORM_UTILS,
+  USER_SELECTS,
   VERTICAL_ALIGNS,
   VIEWPORT_SIZES,
   VIEWPORT_SPACING,
@@ -305,6 +310,15 @@ export const FAMILIES: readonly GrammarFamily[] = [
     bare: ["pointer-events-none", "pointer-events-auto"],
     cssProperties: ["pointer-events"],
     examples: ["pointer-events-none"],
+  },
+  {
+    id: "user-select",
+    title: "User select",
+    summary: "Controls text selection: `user-select-none`, `user-select-text`.",
+    matchers: ["matchUserSelect"],
+    stems: [stem("user-select", USER_SELECTS, "user-select")],
+    cssProperties: ["user-select"],
+    examples: ["user-select-none", "user-select-text", "user-select-all"],
   },
 
   // --- Display ---------------------------------------------------------------
@@ -591,6 +605,16 @@ export const FAMILIES: readonly GrammarFamily[] = [
 
   // --- Typography ------------------------------------------------------------
   {
+    id: "font-family",
+    title: "Font family",
+    summary: "Generic font stacks: `font-family-mono`, `font-family-sans`, `font-family-serif`.",
+    matchers: ["matchFontFamily"],
+    stems: [stem("font-family", Object.keys(FONT_FAMILIES), "font-family")],
+    cssProperties: ["font-family"],
+    examples: ["font-family-mono", "font-family-sans"],
+    docs: "Each value reads a CSS variable first and falls back to a generic stack — `font-family-mono` is `var(--font-mono, ui-monospace, …)`. Theme the stack by defining `--font-mono`, `--font-sans` or `--font-serif`. There is no family for project-specific faces; declare those in your own stylesheet.",
+  },
+  {
     id: "font-size",
     title: "Font size",
     summary: "`fs-1-5-rem`, `fs-16px`, `fs-2-em`.",
@@ -620,6 +644,28 @@ export const FAMILIES: readonly GrammarFamily[] = [
     examples: ["text-center", "text-uppercase", "text-ellipsis-3"],
   },
   {
+    id: "text-decoration",
+    title: "Text decoration",
+    summary: "`text-decoration-none`, `text-decoration-underline`, `text-decoration-line-through`.",
+    matchers: ["matchTextDecoration"],
+    stems: [stem("text-decoration", TEXT_DECORATIONS, "text-decoration")],
+    cssProperties: ["text-decoration"],
+    examples: ["text-decoration-none", "text-decoration-underline"],
+  },
+  {
+    id: "list-style",
+    title: "List style",
+    summary: "`list-style-none`, `list-style-disc`, `list-style-position-inside`.",
+    matchers: ["matchListStyle"],
+    stems: [
+      stem("list-style", LIST_STYLE_TYPES, "list-style-type"),
+      stem("list-style-position", LIST_STYLE_POSITIONS, "list-style-position"),
+    ],
+    cssProperties: ["list-style-type", "list-style-position"],
+    examples: ["list-style-none", "list-style-disc", "list-style-position-inside"],
+    docs: "`list-style-*` writes `list-style-type`; the marker position is the separate `list-style-position-*` stem.",
+  },
+  {
     id: "line-height",
     title: "Line height",
     summary: "`lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` — the dash is the decimal point.",
@@ -627,7 +673,7 @@ export const FAMILIES: readonly GrammarFamily[] = [
     stems: [stem("lh", LINE_HEIGHT_VALUES, "line-height")],
     cssProperties: ["line-height"],
     examples: ["lh-1", "lh-1-2", "lh-1-5", "lh-4-5"],
-    docs: "`1`–`2` in steps of `0.1`, then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size.",
+    docs: "`1`–`2` in steps of `0.05` (so `lh-1-45` is `1.45`), then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size.",
   },
   {
     id: "white-space",

@@ -2,7 +2,7 @@
 
 # ukit-css class reference
 
-The engine generates CSS on demand, but the **vocabulary is finite**: 4,703 base utilities, 14,108 including the `-m` and `-t` variants. This page is the complete reference.
+The engine generates CSS on demand, but the **vocabulary is finite**: 4,726 base utilities, 14,177 including the `-m` and `-t` variants. This page is the complete reference.
 
 ## Naming rules
 
@@ -46,6 +46,7 @@ These compile successfully, so nothing warns you — but they do not mean what t
 | [Cursor](#cursor) | 11 | `cursor` | `cursor` |
 | [Outline](#outline) | 1 | — | `outline` |
 | [Pointer events](#pointer-events) | 2 | — | `pointer-events` |
+| [User select](#user-select) | 5 | `user-select` | `user-select` |
 | [Display](#display) | 16 | `d` | `display` |
 | [Sizing — percentages](#sizing-percent) | 30 | `w` `h` | `width`, `height` |
 | [Sizing — fixed pixels](#sizing-fixed) | 1060 | `w` `h` `max-w` `min-w` `max-h` `min-h` | `width`, `height`, `max-width`, `min-width`, `max-height`, `min-height` |
@@ -68,9 +69,12 @@ These compile successfully, so nothing warns you — but they do not mean what t
 | [Overflow](#overflow) | 12 | `overflow` `overflow-x` `overflow-y` | `overflow`, `overflow-x`, `overflow-y` |
 | [Opacity](#opacity) | 19 | `opacity` | `opacity` |
 | [Spacing — margin, padding, gap](#spacing) | 2401 | `m` `mt` `mb` `ml` `mr` `ms` `me` `mx` `my` `p` `pt` `pb` `pl` `pr` `ps` `pe` `px` `py` `gap` | `margin`, `padding`, `gap` |
+| [Font family](#font-family) | 3 | `font-family` | `font-family` |
 | [Font size](#font-size) | 92 | `fs` | `font-size` |
 | [Font weight](#font-weight) | 11 | `fw` | `font-weight` |
 | [Text align, transform & ellipsis](#text) | 16 | `text` | `text-align`, `text-transform`, `text-overflow`, `white-space` |
+| [Text decoration](#text-decoration) | 4 | `text-decoration` | `text-decoration` |
+| [List style](#list-style) | 11 | `list-style` `list-style-position` | `list-style-type`, `list-style-position` |
 | [Line height](#line-height) | 26 | `lh` | `line-height` |
 | [White space](#white-space) | 6 | `ws` | `white-space` |
 | [Letter spacing](#letter-spacing) | 56 | `letter-spacing` | `letter-spacing` |
@@ -129,6 +133,20 @@ Enables or disables pointer interaction.
 - **CSS properties:** `pointer-events`
 - **Examples:** `pointer-events-none`
 - **No value:** `pointer-events-none`, `pointer-events-auto`
+
+<a id="user-select"></a>
+
+### User select
+
+Controls text selection: `user-select-none`, `user-select-text`.
+
+- **Matchers:** `matchUserSelect`
+- **CSS properties:** `user-select`
+- **Examples:** `user-select-none`, `user-select-text`, `user-select-all`
+
+| Stem | Targets | Values |
+| --- | --- | --- |
+| `user-select-` | user-select | `none`, `text`, `all`, `auto`, `contain` |
 
 <a id="display"></a>
 
@@ -476,6 +494,22 @@ Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` h
 | `py-` | padding-top + padding-bottom | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
 | `gap-` | gap | `0px`, `1px`, `2px`, `3px`, `4px`, `5px`, `6px`, `7px`, `8px`, `9px`, `10px`, `11px`, `12px`, `13px`, `14px`, `15px`, `16px`, `17px`, `18px`, `19px`, `20px`, `21px`, `22px`, `23px`, … (+102 more) |
 
+<a id="font-family"></a>
+
+### Font family
+
+Generic font stacks: `font-family-mono`, `font-family-sans`, `font-family-serif`.
+
+Each value reads a CSS variable first and falls back to a generic stack — `font-family-mono` is `var(--font-mono, ui-monospace, …)`. Theme the stack by defining `--font-mono`, `--font-sans` or `--font-serif`. There is no family for project-specific faces; declare those in your own stylesheet.
+
+- **Matchers:** `matchFontFamily`
+- **CSS properties:** `font-family`
+- **Examples:** `font-family-mono`, `font-family-sans`
+
+| Stem | Targets | Values |
+| --- | --- | --- |
+| `font-family-` | font-family | `sans`, `serif`, `mono` |
+
 <a id="font-size"></a>
 
 ### Font size
@@ -519,13 +553,44 @@ Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` h
 | --- | --- | --- |
 | `text-` | text-align or text-transform | `left`, `center`, `right`, `justify`, `start`, `end`, `uppercase`, `lowercase`, `capitalize`, `none` |
 
+<a id="text-decoration"></a>
+
+### Text decoration
+
+`text-decoration-none`, `text-decoration-underline`, `text-decoration-line-through`.
+
+- **Matchers:** `matchTextDecoration`
+- **CSS properties:** `text-decoration`
+- **Examples:** `text-decoration-none`, `text-decoration-underline`
+
+| Stem | Targets | Values |
+| --- | --- | --- |
+| `text-decoration-` | text-decoration | `none`, `underline`, `overline`, `line-through` |
+
+<a id="list-style"></a>
+
+### List style
+
+`list-style-none`, `list-style-disc`, `list-style-position-inside`.
+
+`list-style-*` writes `list-style-type`; the marker position is the separate `list-style-position-*` stem.
+
+- **Matchers:** `matchListStyle`
+- **CSS properties:** `list-style-type`, `list-style-position`
+- **Examples:** `list-style-none`, `list-style-disc`, `list-style-position-inside`
+
+| Stem | Targets | Values |
+| --- | --- | --- |
+| `list-style-` | list-style-type | `none`, `disc`, `circle`, `square`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` |
+| `list-style-position-` | list-style-position | `inside`, `outside` |
+
 <a id="line-height"></a>
 
 ### Line height
 
 `lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` — the dash is the decimal point.
 
-`1`–`2` in steps of `0.1`, then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size.
+`1`–`2` in steps of `0.05` (so `lh-1-45` is `1.45`), then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size.
 
 - **Matchers:** `matchLineHeight`
 - **CSS properties:** `line-height`

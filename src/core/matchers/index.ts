@@ -10,7 +10,7 @@
 // =============================================================================
 
 import type { Breakpoint, MatchResult } from "../types.js"
-import { matchBackground, matchCursor, matchOutlineNone, matchPointerEvents } from "./base.js"
+import { matchBackground, matchCursor, matchOutlineNone, matchPointerEvents, matchUserSelect } from "./base.js"
 import { matchDisplay } from "./display.js"
 import {
   matchContentSize,
@@ -39,11 +39,14 @@ import {
 import { matchOpacity, matchOverflow, matchZIndex } from "./z-overflow-opacity.js"
 import { matchSpacing } from "./spacing.js"
 import {
+  matchFontFamily,
   matchFontSize,
   matchFontWeight,
   matchLetterSpacing,
   matchLineHeight,
+  matchListStyle,
   matchText,
+  matchTextDecoration,
   matchWhiteSpace,
 } from "./typography.js"
 import { matchBorder, matchBorderRadius } from "./borders.js"
@@ -70,6 +73,7 @@ const MATCHERS: Matcher[] = [
   matchCursor,
   matchOutlineNone,
   matchPointerEvents,
+  matchUserSelect,
 
   // --- Display ---
   matchDisplay,
@@ -109,8 +113,11 @@ const MATCHERS: Matcher[] = [
   matchLetterSpacing, // letter-spacing-* before text-* (no overlap, but order keeps it tidy)
   matchFontSize,
   matchFontWeight,
+  matchFontFamily,
   matchLineHeight,
   matchWhiteSpace,
+  matchListStyle, // list-style-position-* before list-style-*
+  matchTextDecoration, // text-decoration-* before text-*
   matchText, // text-{align|transform|ellipsis|ellipsis-N}
 
   // --- Borders (radius BEFORE border) ---

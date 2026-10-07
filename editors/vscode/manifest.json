@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "package": "@vcalderondev/ukit-css",
   "description": "JIT utility-first CSS engine. Class names are generated on demand, but the vocabulary is finite and fully enumerated here.",
   "naming": {
@@ -43,9 +43,9 @@
     ]
   },
   "counts": {
-    "families": 40,
-    "base": 4703,
-    "withBreakpoints": 14108
+    "families": 44,
+    "base": 4726,
+    "withBreakpoints": 14177
   },
   "tailwindAliases": {
     "flex": [
@@ -185,6 +185,30 @@
     ],
     "sr-only": [
       "text-ellipsis"
+    ],
+    "select-none": [
+      "user-select-none"
+    ],
+    "select-text": [
+      "user-select-text"
+    ],
+    "select-all": [
+      "user-select-all"
+    ],
+    "no-underline": [
+      "text-decoration-none"
+    ],
+    "line-through": [
+      "text-decoration-line-through"
+    ],
+    "list-none": [
+      "list-style-none"
+    ],
+    "list-disc": [
+      "list-style-disc"
+    ],
+    "list-decimal": [
+      "list-style-decimal"
     ]
   },
   "semanticTraps": {
@@ -296,6 +320,37 @@
         "pointer-events-auto"
       ],
       "stems": [],
+      "extra": []
+    },
+    {
+      "id": "user-select",
+      "title": "User select",
+      "summary": "Controls text selection: `user-select-none`, `user-select-text`.",
+      "cssProperties": [
+        "user-select"
+      ],
+      "examples": [
+        "user-select-none",
+        "user-select-text",
+        "user-select-all"
+      ],
+      "matchers": [
+        "matchUserSelect"
+      ],
+      "bare": [],
+      "stems": [
+        {
+          "stem": "user-select",
+          "values": [
+            "none",
+            "text",
+            "all",
+            "auto",
+            "contain"
+          ],
+          "targets": "user-select"
+        }
+      ],
       "extra": []
     },
     {
@@ -5484,6 +5539,35 @@
       "docs": "Directions: `t` `b` `l` `r` `s` `e` (single side), `x` `y` (axis). Units: `px` has no dash (`p-16px`); `rem`, `em`, `vh`, `vw` use a dash (`p-1-5-rem`). A bare number is a legacy alias: `em` wins, then `px`, then `rem` — so `p-1` is `1em` but `p-16` is `16px`. Only the margin family accepts `auto`: `m-auto`, `mx-auto`, `mt-auto`, `mb-auto`, `ms-auto`, `me-auto`, `my-auto`."
     },
     {
+      "id": "font-family",
+      "title": "Font family",
+      "summary": "Generic font stacks: `font-family-mono`, `font-family-sans`, `font-family-serif`.",
+      "cssProperties": [
+        "font-family"
+      ],
+      "examples": [
+        "font-family-mono",
+        "font-family-sans"
+      ],
+      "matchers": [
+        "matchFontFamily"
+      ],
+      "bare": [],
+      "stems": [
+        {
+          "stem": "font-family",
+          "values": [
+            "sans",
+            "serif",
+            "mono"
+          ],
+          "targets": "font-family"
+        }
+      ],
+      "extra": [],
+      "docs": "Each value reads a CSS variable first and falls back to a generic stack — `font-family-mono` is `var(--font-mono, ui-monospace, …)`. Theme the stack by defining `--font-mono`, `--font-sans` or `--font-serif`. There is no family for project-specific faces; declare those in your own stylesheet."
+    },
+    {
       "id": "font-size",
       "title": "Font size",
       "summary": "`fs-1-5-rem`, `fs-16px`, `fs-2-em`.",
@@ -5685,6 +5769,80 @@
       "extra": []
     },
     {
+      "id": "text-decoration",
+      "title": "Text decoration",
+      "summary": "`text-decoration-none`, `text-decoration-underline`, `text-decoration-line-through`.",
+      "cssProperties": [
+        "text-decoration"
+      ],
+      "examples": [
+        "text-decoration-none",
+        "text-decoration-underline"
+      ],
+      "matchers": [
+        "matchTextDecoration"
+      ],
+      "bare": [],
+      "stems": [
+        {
+          "stem": "text-decoration",
+          "values": [
+            "none",
+            "underline",
+            "overline",
+            "line-through"
+          ],
+          "targets": "text-decoration"
+        }
+      ],
+      "extra": []
+    },
+    {
+      "id": "list-style",
+      "title": "List style",
+      "summary": "`list-style-none`, `list-style-disc`, `list-style-position-inside`.",
+      "cssProperties": [
+        "list-style-type",
+        "list-style-position"
+      ],
+      "examples": [
+        "list-style-none",
+        "list-style-disc",
+        "list-style-position-inside"
+      ],
+      "matchers": [
+        "matchListStyle"
+      ],
+      "bare": [],
+      "stems": [
+        {
+          "stem": "list-style",
+          "values": [
+            "none",
+            "disc",
+            "circle",
+            "square",
+            "decimal",
+            "lower-alpha",
+            "upper-alpha",
+            "lower-roman",
+            "upper-roman"
+          ],
+          "targets": "list-style-type"
+        },
+        {
+          "stem": "list-style-position",
+          "values": [
+            "inside",
+            "outside"
+          ],
+          "targets": "list-style-position"
+        }
+      ],
+      "extra": [],
+      "docs": "`list-style-*` writes `list-style-type`; the marker position is the separate `list-style-position-*` stem."
+    },
+    {
       "id": "line-height",
       "title": "Line height",
       "summary": "`lh-1`, `lh-1-2`, `lh-1-5`, `lh-4-5` — the dash is the decimal point.",
@@ -5736,7 +5894,7 @@
         }
       ],
       "extra": [],
-      "docs": "`1`–`2` in steps of `0.1`, then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size."
+      "docs": "`1`–`2` in steps of `0.05` (so `lh-1-45` is `1.45`), then `2.5`, `3`, `3.5`, `4`, `4.5`. Values are unitless multipliers, so they inherit the element's own font size."
     },
     {
       "id": "white-space",

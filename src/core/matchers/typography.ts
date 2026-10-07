@@ -7,6 +7,7 @@
 
 import type { MatchResult } from "../types.js"
 import {
+  FONT_FAMILIES,
   FONT_WEIGHTS,
   FS_EM_SET,
   FS_PX_SET,
@@ -14,7 +15,10 @@ import {
   LETTER_SPACING_EM_SET,
   LETTER_SPACING_PX_SET,
   LINE_HEIGHT_SET,
+  LIST_STYLE_POSITIONS,
+  LIST_STYLE_TYPES,
   TEXT_ALIGNS,
+  TEXT_DECORATIONS,
   TEXT_TRANSFORMS,
   WHITE_SPACES,
 } from "../tokens.js"
@@ -23,6 +27,41 @@ import { dashToDot, decl, declMany } from "./helpers.js"
 const TEXT_ALIGN_SET = new Set<string>(TEXT_ALIGNS)
 const TEXT_TRANSFORM_SET = new Set<string>(TEXT_TRANSFORMS)
 const WHITE_SPACE_SET = new Set<string>(WHITE_SPACES)
+const TEXT_DECORATION_SET = new Set<string>(TEXT_DECORATIONS)
+const LIST_STYLE_TYPE_SET = new Set<string>(LIST_STYLE_TYPES)
+const LIST_STYLE_POSITION_SET = new Set<string>(LIST_STYLE_POSITIONS)
+
+// .font-family-{sans|serif|mono} — themeable through --font-* with a generic
+// stack as fallback, so the class still applies something useful on its own.
+export function matchFontFamily(name: string): MatchResult | null {
+  if (!name.startsWith("font-family-")) return null
+  const stack = FONT_FAMILIES[name.slice("font-family-".length)]
+  if (stack === undefined) return null
+  return decl("font-family", stack, { category: 8 })
+}
+
+// .text-decoration-{none|underline|overline|line-through}
+export function matchTextDecoration(name: string): MatchResult | null {
+  if (!name.startsWith("text-decoration-")) return null
+  const value = name.slice("text-decoration-".length)
+  if (!TEXT_DECORATION_SET.has(value)) return null
+  return decl("text-decoration", value, { category: 8 })
+}
+
+// .list-style-{type} and .list-style-position-{inside|outside}
+// The longer stem is tested first so `list-style-position-inside` is not read
+// as the list-style type `position-inside`.
+export function matchListStyle(name: string): MatchResult | null {
+  if (name.startsWith("list-style-position-")) {
+    const value = name.slice("list-style-position-".length)
+    if (!LIST_STYLE_POSITION_SET.has(value)) return null
+    return decl("list-style-position", value, { category: 8 })
+  }
+  if (!name.startsWith("list-style-")) return null
+  const value = name.slice("list-style-".length)
+  if (!LIST_STYLE_TYPE_SET.has(value)) return null
+  return decl("list-style-type", value, { category: 8 })
+}
 
 // .fs-{value}{-unit?}
 export function matchFontSize(name: string): MatchResult | null {

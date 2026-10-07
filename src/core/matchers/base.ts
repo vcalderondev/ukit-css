@@ -1,14 +1,15 @@
 // =============================================================================
 // BASE MATCHERS
 // -----------------------------------------------------------------------------
-// Background resets, cursor, outline, pointer-events.
+// Background resets, cursor, outline, pointer-events, user-select.
 // =============================================================================
 
 import type { MatchResult } from "../types.js"
-import { CURSORS } from "../tokens.js"
+import { CURSORS, USER_SELECTS } from "../tokens.js"
 import { decl } from "./helpers.js"
 
 const CURSOR_SET = new Set<string>(CURSORS)
+const USER_SELECT_SET = new Set<string>(USER_SELECTS)
 
 export function matchBackground(name: string): MatchResult | null {
   if (name === "bg-transparent") return decl("background", "transparent", { category: 1 })
@@ -32,4 +33,12 @@ export function matchPointerEvents(name: string): MatchResult | null {
   if (name === "pointer-events-none") return decl("pointer-events", "none", { category: 1 })
   if (name === "pointer-events-auto") return decl("pointer-events", "auto", { category: 1 })
   return null
+}
+
+// .user-select-{none|text|all|auto|contain}
+export function matchUserSelect(name: string): MatchResult | null {
+  if (!name.startsWith("user-select-")) return null
+  const value = name.slice("user-select-".length)
+  if (!USER_SELECT_SET.has(value)) return null
+  return decl("user-select", value, { category: 1 })
 }
