@@ -1,6 +1,6 @@
 {
   "name": "@vcalderondev/ukit-css",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "JIT utility-first CSS engine — Tailwind-style on-demand class generation for any framework (React, Vue, Angular, Svelte, Next.js, Astro, vanilla HTML).",
   "type": "module",
   "main": "./dist/index.cjs",

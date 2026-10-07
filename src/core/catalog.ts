@@ -17,7 +17,7 @@ import type { Breakpoint, GeneratedRule } from "./types.js"
 import { FAMILIES, allStems, enumerateFamily, type GrammarFamily } from "./grammar.js"
 import { matchCandidate, MATCHER_REGISTRY } from "./matchers/index.js"
 import { emitRule } from "./generator.js"
-import { DEFAULT_BREAKPOINTS } from "./tokens.js"
+import { DEFAULT_BREAKPOINTS, LINE_HEIGHTS } from "./tokens.js"
 
 export interface CatalogEntry {
   /** Base class name, without any `-m` / `-t` suffix. */
@@ -272,7 +272,10 @@ export const SEMANTIC_TRAPS: Readonly<Record<string, string>> = {
   "fs-1": "a bare number in the font-size family is rem — fs-1 is font-size: 1rem.",
   "rounded-md": "8px here, not Tailwind's 6px. The named radius scale is xs(2) sm(4) md(8) lg(12) xl(16) 2xl(24) full(9999).",
   "lh-1-5": "the dash is a decimal point, so this is line-height: 1.5.",
-  "lh-4-5": "the dash is a decimal point, so this is line-height: 4.5. The scale is 1–2 in steps of 0.1, then 2.5, 3, 3.5, 4, 4.5 — there is no lh-1-25.",
+  // The factual half of this sentence is derived from the same constant the
+  // matcher uses. Writing it by hand is how "there is no lh-1-25" ended up in
+  // the published docs while lh-1-25 was perfectly valid.
+  "lh-4-5": `the dash is a decimal point, so this is line-height: 4.5. ${LINE_HEIGHTS.length} line heights exist: 1 to 2 in steps of 0.05, then 2.5, 3, 3.5, 4 and 4.5 — so lh-1-25 is 1.25.`,
   "h-100vh": "viewport units are written as a suffix and work for h/w plus the constraint helpers (min-h-100vh, max-h-60vh, max-w-100vw). There is no 'screen' keyword.",
   "border": "paints 1px solid var(--border); set --border to theme it.",
   "animate-spin": "the only family emitted without !important, so it stays overridable.",

@@ -331,6 +331,48 @@ describe("curated misconception data", () => {
     }
   })
 
+  it("never claims a class is absent when it exists", () => {
+    // The published docs said "there is no lh-1-25" while lh-1-25 was a valid
+    // class. Any prose in a trap that denies a class exists is checked against
+    // the oracle, so a stale claim cannot ship again.
+    const claims = []
+    for (const [cls, text] of Object.entries(SEMANTIC_TRAPS)) {
+      const patterns = [
+        /(?:there is no|there's no|no such class as)\s+`?([a-z][a-z0-9-]{2,})`?/gi,
+        /`?([a-z][a-z0-9-]{2,})`?\s+(?:does not exist|doesn't exist|is not a class)/gi,
+      ]
+      for (const pattern of patterns) {
+        for (const m of text.matchAll(pattern)) claims.push({ cls, claimed: m[1] })
+      }
+      // A trap must not claim a whole keyword does not exist while a class
+      // built on it is valid (e.g. "there is no 'screen' keyword").
+      for (const m of text.matchAll(/there is no '([a-z-]+)' keyword/gi)) {
+        claims.push({ cls, claimed: m[1], keyword: true })
+      }
+    }
+
+    assert.ok(claims.length > 0, "expected at least one absence claim to verify")
+    for (const { cls, claimed, keyword } of claims) {
+      if (keyword) {
+        // Nothing should be a valid class ending in the denied keyword.
+        const built = [`min-h-${claimed}`, `h-${claimed}`, `w-${claimed}`, claimed]
+        for (const candidate of built) {
+          assert.equal(
+            matchCandidate(candidate),
+            null,
+            `trap for "${cls}" denies the "${claimed}" keyword, but "${candidate}" is valid`,
+          )
+        }
+        continue
+      }
+      assert.equal(
+        matchCandidate(claimed),
+        null,
+        `trap for "${cls}" claims "${claimed}" does not exist, but it is a valid class`,
+      )
+    }
+  })
+
   it("ships both maps in the manifest", () => {
     const manifest = buildManifest()
     assert.deepEqual(manifest.tailwindAliases["text-sm"], ["fs-0-875-rem"])
