@@ -11,7 +11,7 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { describe, it } from "node:test"
 
-import { auditCatalog, createCatalog, explainClass, looksLikeUtility, suggestClasses } from "../src/core/catalog.ts"
+import { auditCatalog, createCatalog, explainClass, isClassShaped, looksLikeUtility, suggestClasses } from "../src/core/catalog.ts"
 import { SEMANTIC_TRAPS, TAILWIND_ALIASES } from "../src/core/catalog.ts"
 import { matchCandidate } from "../src/core/matchers/index.ts"
 import { FAMILIES } from "../src/core/grammar.ts"
@@ -239,6 +239,64 @@ describe("public API robustness", () => {
     assert.deepEqual(result.valid, ["m-1-rem"])
     assert.deepEqual(result.unknown, ["d-flx"])
     assert.deepEqual(result.diagnostics.map((d) => d.token), ["d-flx"])
+  })
+})
+
+describe("diagnostic noise", () => {
+  // The extractor scrapes arbitrary text on purpose, so it also produces tokens
+  // that are obviously not classes. Reporting those made `validate` warn about
+  // `z-index: -1` and `box-sizing: border-box` in inline CSS.
+  const noise = [
+    "-",
+    "-1",
+    "+1",
+    "border-box",
+    "z-index",
+    "box-sizing",
+    "margin-left",
+    "background-color",
+    "__proto__",
+    "foo_bar",
+    "1-2-3",
+  ]
+
+  it("never reports a token that is not spelled like a class", () => {
+    const result = validateClasses([...noise, "m-1-rem"])
+    assert.deepEqual(
+      result.diagnostics.map((d) => d.token),
+      [],
+      `noise leaked into the diagnostics: ${JSON.stringify(result.diagnostics)}`,
+    )
+  })
+
+  it("still reports every genuine near miss", () => {
+    // Regression guard for the fix above: tightening the gate must not lose
+    // the suggestions that make `validate` worth running.
+    const real = ["d-flx", "items-center", "justify-between", "text-sm", "w-full"]
+    const result = validateClasses([
+      ...real,
+      "d-flex",
+      "align-items-center",
+      "m-1-rem",
+      "p-button__icon",
+    ])
+    assert.deepEqual(
+      result.diagnostics.map((d) => d.token),
+      ["d-flx", "items-center", "justify-between", "text-sm", "w-full"],
+    )
+    assert.deepEqual(
+      result.diagnostics.map((d) => d.suggestions[0]),
+      ["d-flex", "align-items-center", "justify-content-between", "fs-0-875-rem", "w-100"],
+    )
+  })
+
+  it("keeps isClassShaped honest about the shape it accepts", () => {
+    assert.equal(isClassShaped("m-1-rem"), true)
+    assert.equal(isClassShaped("d-flx"), true)
+    assert.equal(isClassShaped("border"), false, "needs a dash")
+    assert.equal(isClassShaped("-1"), false, "must start with a letter")
+    assert.equal(isClassShaped("p-button__icon"), false)
+    assert.equal(isClassShaped("x".repeat(49)), false)
   })
 })
 

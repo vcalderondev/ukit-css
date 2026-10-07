@@ -1819,16 +1819,22 @@ function suggestClasses(name, limit = 3) {
     }
   }
   if (out.length === 0) {
-    const budget = base.length > 12 ? 1 : 2;
+    const budget = base.length >= 8 ? 1 : 2;
     const scored = catalog.baseClasses.filter((c) => Math.abs(c.length - base.length) <= budget + 1).map((c) => ({ c, d: distance(base, c, budget) })).filter((s) => s.d <= budget).sort((a, b) => a.d - b.d || a.c.length - b.c.length);
     for (const s of scored) push(s.c);
   }
   return out.slice(0, limit);
 }
+var CLASS_SHAPE = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+function isClassShaped(token) {
+  if (typeof token !== "string") return false;
+  if (token.length < 3 || token.length > 48) return false;
+  return CLASS_SHAPE.test(token) && token.includes("-");
+}
 function diagnoseUnknown(unknown, limit = 3) {
   const out = [];
   for (const token of unknown) {
-    if (typeof token !== "string") continue;
+    if (!isClassShaped(token)) continue;
     const suggestions = suggestClasses(token, limit);
     if (suggestions.length > 0) out.push({ token, suggestions });
   }
@@ -1868,7 +1874,7 @@ function shadowedSuffixes() {
 }
 
 // src/core/version.ts
-var VERSION = "1.1.0";
+var VERSION = "1.1.1";
 
 // src/manifest.ts
 var MANIFEST_SCHEMA_VERSION = 1;

@@ -358,7 +358,11 @@ export function suggestClasses(name: string, limit = 3): string[] {
   }
 
   if (out.length === 0) {
-    const budget = base.length > 12 ? 1 : 2
+    // Only the global fallback is this strict. Longer tokens are almost always
+    // real identifiers or CSS keywords that merely resemble a class, and the
+    // useful cases (`text-sm`, `items-center`) are covered by the curated
+    // aliases and the tail match above, not by raw edit distance.
+    const budget = base.length >= 8 ? 1 : 2
     const scored = catalog.baseClasses
       .filter((c) => Math.abs(c.length - base.length) <= budget + 1)
       .map((c) => ({ c, d: distance(base, c, budget) }))
@@ -378,16 +382,28 @@ export function suggestClasses(name: string, limit = 3): string[] {
 const CLASS_SHAPE = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/
 
 /**
- * Decide whether an unmatched token deserves a warning. Deliberately
- * conservative: a token is only reported when it has the lexical shape of a
- * class, its stem is part of the grammar, and at least one close suggestion
- * exists. That keeps BEM names, file paths and ordinary identifiers quiet.
+ * First gate every *reported* token must pass: it must look like a utility
+ * class at all — lowercase, dashes, between 3 and 48 characters.
+ *
+ * The extractor scrapes arbitrary text on purpose, so it also yields things
+ * that are obviously not classes. Without this gate, inline CSS or arithmetic
+ * in a scanned file produces nonsense warnings: `z-index: -1` and
+ * `box-sizing: border-box` would be reported as near misses of `m-1` and
+ * `border-b`.
  */
-export function looksLikeUtility(token: string, suggestions?: string[]): boolean {
+export function isClassShaped(token: string): boolean {
   if (typeof token !== "string") return false
   if (token.length < 3 || token.length > 48) return false
-  if (!CLASS_SHAPE.test(token)) return false
-  if (!token.includes("-")) return false
+  return CLASS_SHAPE.test(token) && token.includes("-")
+}
+
+/**
+ * Stricter gate used by the public `looksLikeUtility()` helper: the token must
+ * look like a class *and* start with a stem the grammar actually has (or be a
+ * known Tailwind misconception), *and* have a close suggestion.
+ */
+export function looksLikeUtility(token: string, suggestions?: string[]): boolean {
+  if (!isClassShaped(token)) return false
   const catalog = getCatalog()
   if (!matchingStem(token, catalog.stems) && !TAILWIND_ALIASES[token]) return false
   const near = suggestions ?? suggestClasses(token, 1)
@@ -403,11 +419,15 @@ export interface Diagnostic {
  * Diagnostics for tokens already known to be invalid. Split out from `diagnose`
  * so the engine can reuse the candidate scan it already performed instead of
  * validating every token twice.
+ *
+ * Only class-shaped tokens are considered; a token that is not even spelled
+ * like a class is never worth a warning, however close a suggestion happens to
+ * be.
  */
 export function diagnoseUnknown(unknown: Iterable<string>, limit = 3): Diagnostic[] {
   const out: Diagnostic[] = []
   for (const token of unknown) {
-    if (typeof token !== "string") continue
+    if (!isClassShaped(token)) continue
     const suggestions = suggestClasses(token, limit)
     if (suggestions.length > 0) out.push({ token, suggestions })
   }

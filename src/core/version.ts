@@ -6,4 +6,4 @@
 // release workflow bumps both together (see AGENTS.md).
 // =============================================================================
 
-export const VERSION = "1.1.0"
+export const VERSION = "1.1.1"
