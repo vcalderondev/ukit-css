@@ -1868,7 +1868,7 @@ function shadowedSuffixes() {
 }
 
 // src/core/version.ts
-var VERSION = "1.0.2";
+var VERSION = "1.1.0";
 
 // src/manifest.ts
 var MANIFEST_SCHEMA_VERSION = 1;

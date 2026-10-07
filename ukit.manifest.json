@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.2",
+  "version": "1.1.0",
   "package": "@vcalderondev/ukit-css",
   "description": "JIT utility-first CSS engine. Class names are generated on demand, but the vocabulary is finite and fully enumerated here.",
   "naming": {
