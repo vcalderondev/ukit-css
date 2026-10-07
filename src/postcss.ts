@@ -22,6 +22,9 @@ export interface PostcssOptions extends UkitConfig {
   configFile?: string
 }
 
+/** Cap on warnings per compile, so a big refactor cannot flood the console. */
+const MAX_WARNINGS = 12
+
 const ukit = (options: PostcssOptions = {}): AcceptedPlugin => {
   return {
     postcssPlugin: "@vcalderondev/ukit-css",
@@ -41,6 +44,13 @@ const ukit = (options: PostcssOptions = {}): AcceptedPlugin => {
       const merged: UkitConfig = { ...fileConfig, ...options }
       delete (merged as PostcssOptions).configFile
 
+      // Diagnostics are a development aid: on outside production, opt-in
+      // inside it. Unknown classes never emit CSS, so silence here is how
+      // typos and Tailwind habits slip through unnoticed.
+      if (merged.diagnostics === undefined) {
+        merged.diagnostics = process.env.NODE_ENV !== "production"
+      }
+
       const result = await build(merged, cwd)
 
       // Inject scanned files as dependencies so PostCSS-aware bundlers
@@ -52,6 +62,23 @@ const ukit = (options: PostcssOptions = {}): AcceptedPlugin => {
           file,
           parent: root.source?.input.file ?? "",
         })
+      }
+
+      for (const diagnostic of result.diagnostics.slice(0, MAX_WARNINGS)) {
+        helpers.result.warn(
+          `"${diagnostic.token}" matches no utility class, so no CSS was emitted.${
+            diagnostic.suggestions.length > 0
+              ? ` Did you mean ${diagnostic.suggestions.join(", ")}?`
+              : ""
+          }`,
+          { plugin: "@vcalderondev/ukit-css" },
+        )
+      }
+      if (result.diagnostics.length > MAX_WARNINGS) {
+        helpers.result.warn(
+          `… and ${result.diagnostics.length - MAX_WARNINGS} more unmatched class names. Run \`npx ukit-css validate\` for the full list.`,
+          { plugin: "@vcalderondev/ukit-css" },
+        )
       }
 
       const css = result.css.trim()

@@ -69,6 +69,13 @@ export interface UkitConfig {
   safelist?: string[]
   /** Minify the output CSS (default: false). */
   minify?: boolean
+  /**
+   * Report candidates that look like utility classes but do not match, with
+   * "did you mean" suggestions. Off by default because it costs a bounded
+   * search over the whole vocabulary; the bundler plugins turn it on in
+   * development, and `ukit-css validate` always enables it.
+   */
+  diagnostics?: boolean
 }
 
 export interface ResolvedConfig extends Required<Omit<UkitConfig, "content" | "output">> {

@@ -9,7 +9,9 @@ import { COMMON_FIXED_SIZES, SIZE_PERCENT_SET, VIEWPORT_SIZE_SET } from "../toke
 import { decl, declMany } from "./helpers.js"
 
 // Build sets of valid fixed-pixel sizes (1–64 + common large sizes).
-const FIXED_SIZE_SET = new Set<string>()
+// Exported so `grammar.ts` documents exactly the sizes the matcher accepts
+// (the anti-drift test in test/catalog.test.mjs keeps both in lockstep).
+export const FIXED_SIZE_SET = new Set<string>()
 for (let i = 0; i <= 64; i++) FIXED_SIZE_SET.add(String(i))
 for (const s of COMMON_FIXED_SIZES) FIXED_SIZE_SET.add(String(s))
 
@@ -100,11 +102,9 @@ export function matchVwVhAlias(name: string): MatchResult | null {
   return null
 }
 
-// Auto margins live in spacing matcher; auto sizing belongs here.
-export function matchAutoSize(name: string): MatchResult | null {
-  // Already handled in matchContentSize, retained for clarity.
-  return null
-}
+// Auto sizing (`w-auto`, `h-auto`) lives in `matchContentSize` above; there is
+// deliberately no separate matcher, so that every function in this directory is
+// registered in MATCHER_REGISTRY and declared in `grammar.ts`.
 
 // Re-export helper for declMany if needed by other modules.
 export { declMany }

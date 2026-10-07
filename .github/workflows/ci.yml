@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Tags are needed so `release:check` can audit tag/package identity.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Fails if ukit.manifest.json, ukit.classes.txt, the generated types or
+      # the docs no longer match src/core/grammar.ts.
+      - name: Check generated artifacts are up to date
+        run: npm run generate:check
+
+      # The anti-drift suite: grammar <-> matchers, in both directions.
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # The VS Code extension ships a copy of the engine; if it drifts, the
+      # extension contradicts the real matchers.
+      - name: Check the extension's vendored engine is up to date
+        run: npm run check:vendor
+
+      - name: Test the VS Code extension
+        run: npm run test:extension
+
+      # Informational: reports tags that belong to other package identities.
+      - name: Release metadata report
+        run: node scripts/check-release.mjs

@@ -17,6 +17,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Tags are needed so the release check can audit tag/package identity.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v6
         with:
@@ -43,6 +46,24 @@ jobs:
       - name: Install dependencies
         if: steps.check.outputs.skip == 'false'
         run: npm ci
+
+      # Nothing reaches the registry unless the grammar and its generated
+      # artifacts agree, and the version is consistent with npm and git.
+      - name: Typecheck
+        if: steps.check.outputs.skip == 'false'
+        run: npm run typecheck
+
+      - name: Check generated artifacts are up to date
+        if: steps.check.outputs.skip == 'false'
+        run: npm run generate:check
+
+      - name: Test
+        if: steps.check.outputs.skip == 'false'
+        run: npm test
+
+      - name: Release consistency gate
+        if: steps.check.outputs.skip == 'false'
+        run: node scripts/check-release.mjs --strict
 
       - name: Publish to NPM
         if: steps.check.outputs.skip == 'false'

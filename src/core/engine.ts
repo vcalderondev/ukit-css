@@ -14,6 +14,7 @@
 
 import type { GeneratedRule, ResolvedConfig, UkitConfig } from "./types.js"
 import { resolveConfig } from "./config.js"
+import { diagnose, diagnoseUnknown, type Diagnostic } from "./catalog.js"
 import {
   extractCandidatesFromFiles,
   extractCandidatesFromSource,
@@ -31,6 +32,27 @@ export interface BuildResult {
   scannedFiles: string[]
   /** Number of distinct candidates considered (before matching). */
   candidateCount: number
+  /**
+   * Candidates that look like utilities but matched nothing, with suggestions.
+   * Empty unless `diagnostics` is enabled — see `UkitConfig.diagnostics`.
+   */
+  diagnostics: Diagnostic[]
+}
+
+/**
+ * Report the unknown-but-plausible candidates in a set of class names.
+ *
+ * This is the antidote to the JIT's silent failure mode: an unmatched class
+ * produces no CSS and no error, so a typo (`d-flx`, or a Tailwind habit such as
+ * `items-center`) simply does nothing. Exported so bundler plugins, the CLI and
+ * editor tooling all share one implementation.
+ */
+export function collectDiagnostics(
+  candidates: Iterable<string>,
+  config: ResolvedConfig,
+): Diagnostic[] {
+  if (!config.diagnostics) return []
+  return diagnose(candidates).diagnostics
 }
 
 /**
@@ -57,13 +79,17 @@ export function buildFromCandidates(
 ): BuildResult {
   const rules: GeneratedRule[] = []
   const matchedClasses: string[] = []
+  const unknown: string[] = []
   const usedKeyframes = new Set<string>()
   let candidateCount = 0
 
   for (const cand of candidates) {
     candidateCount++
     const match = matchCandidate(cand)
-    if (!match) continue
+    if (!match) {
+      unknown.push(cand)
+      continue
+    }
     matchedClasses.push(cand)
     const { result, breakpoint, selector } = match
     rules.push({
@@ -93,6 +119,7 @@ export function buildFromCandidates(
     matchedClasses,
     scannedFiles,
     candidateCount,
+    diagnostics: config.diagnostics ? diagnoseUnknown(unknown) : [],
   }
 }
 

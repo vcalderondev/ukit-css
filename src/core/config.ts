@@ -26,6 +26,7 @@ export function resolveConfig(user: UkitConfig = {}, cwd = process.cwd()): Resol
     keyframes: user.keyframes ?? true,
     safelist: user.safelist ?? [],
     minify: user.minify ?? false,
+    diagnostics: user.diagnostics ?? false,
   }
 }
 

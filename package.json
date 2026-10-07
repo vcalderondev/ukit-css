@@ -20,6 +20,13 @@
       "import": "./dist/engine.js",
       "require": "./dist/engine.cjs"
     },
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js",
+      "require": "./dist/manifest.cjs"
+    },
+    "./ukit.manifest.json": "./ukit.manifest.json",
+    "./ukit.classes.txt": "./ukit.classes.txt",
     "./postcss": {
       "types": "./dist/postcss.d.ts",
       "import": "./dist/postcss.js",
@@ -34,16 +41,28 @@
   "files": [
     "dist",
     "bin",
-    "README.md"
+    "README.md",
+    "AGENTS.md",
+    "llms.txt",
+    "docs",
+    "ukit.manifest.json",
+    "ukit.classes.txt"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "npm run generate && tsup",
     "prepublishOnly": "npm run build",
     "dev": "tsup --watch",
+    "generate": "node scripts/generate.mjs",
+    "generate:check": "node scripts/generate.mjs --check",
+    "release:check": "node scripts/check-release.mjs",
+    "vendor": "node editors/vscode/scripts/vendor.mjs",
+    "check:vendor": "node scripts/check-vendor.mjs",
+    "test": "node --import ./scripts/ts-resolve-register.mjs --test \"test/**/*.test.mjs\"",
+    "test:extension": "node editors/vscode/test/selftest.mjs && node editors/vscode/test/integration.mjs",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.ts\" \"bin/**/*.mjs\"",
-    "format:check": "prettier --check \"src/**/*.ts\" \"bin/**/*.mjs\"",
-    "smoke": "node --experimental-vm-modules ./scripts/smoke.mjs"
+    "verify": "npm run typecheck && npm run generate:check && npm test && npm run build && npm run check:vendor && npm run test:extension",
+    "format": "prettier --write \"src/**/*.ts\" \"bin/**/*.mjs\" \"scripts/**/*.mjs\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"bin/**/*.mjs\" \"scripts/**/*.mjs\""
   },
   "dependencies": {
     "chokidar": "^3.6.0",
@@ -82,7 +101,10 @@
     "atomic-css",
     "postcss",
     "vite",
-    "ukit-css"
+    "ukit-css",
+    "autocomplete",
+    "intellisense",
+    "typescript-types"
   ],
   "publishConfig": {
     "access": "public"

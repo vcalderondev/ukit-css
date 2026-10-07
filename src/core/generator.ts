@@ -15,7 +15,7 @@ function escapeSelector(name: string): string {
 }
 
 /** Serialise a single rule block to a CSS string. */
-function emitRule(rule: GeneratedRule, indent: string): string {
+export function emitRule(rule: GeneratedRule, indent: string): string {
   const sel = `.${escapeSelector(rule.selector)}`
   const body: string[] = []
   for (const [prop, value] of Object.entries(rule.decls)) {

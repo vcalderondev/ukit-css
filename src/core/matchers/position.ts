@@ -21,7 +21,6 @@ import {
 import { dashToDot, decl } from "./helpers.js"
 
 const POSITION_SET = new Set<string>(POSITIONS)
-const SIDES_SET = new Set<string>(SIDES)
 const VERTICAL_ALIGN_SET = new Set<string>(VERTICAL_ALIGNS)
 
 // .position-{relative|absolute|fixed|sticky}

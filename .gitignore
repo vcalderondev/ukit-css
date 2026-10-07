@@ -7,3 +7,5 @@ dist
 *.css.map
 *.sass.map
 *.scss.map
+# Packaged editor extensions are build artifacts.
+*.vsix

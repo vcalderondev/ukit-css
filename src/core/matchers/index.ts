@@ -56,7 +56,7 @@ import {
 } from "./grid.js"
 import { matchAnimate } from "./animate.js"
 
-type Matcher = (name: string) => MatchResult | null
+export type Matcher = (name: string) => MatchResult | null
 
 /**
  * Order is critical. We put narrow/specific matchers first and broader ones
@@ -132,6 +132,16 @@ const MATCHERS: Matcher[] = [
   matchVerticalAlign,
 ]
 
+/**
+ * The registry itself, exported so tooling can enumerate the matcher chain.
+ *
+ * `grammar.ts` is the declarative counterpart of this list: every function
+ * below MUST be claimed by at least one grammar family, and the anti-drift
+ * test (`test/catalog.test.mjs`) fails if a matcher is added here without a
+ * matching declaration. Order is meaningful — see the comment above.
+ */
+export const MATCHER_REGISTRY: readonly Matcher[] = MATCHERS
+
 function tryMatch(name: string): MatchResult | null {
   for (const fn of MATCHERS) {
     const r = fn(name)
@@ -151,6 +161,11 @@ function tryMatch(name: string): MatchResult | null {
 export function matchCandidate(
   name: string,
 ): { result: MatchResult; breakpoint: Breakpoint; selector: string } | null {
+  // Public API: callers reach this with arbitrary values from JS, class names
+  // composed at runtime, or a non-string slipping through a type boundary.
+  // Returning null beats throwing `name.startsWith is not a function`.
+  if (typeof name !== "string") return null
+
   const direct = tryMatch(name)
   if (direct) return { result: direct, breakpoint: "base", selector: name }
 

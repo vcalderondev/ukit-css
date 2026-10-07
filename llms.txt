@@ -1,0 +1,105 @@
+# @vcalderondev/ukit-css
+
+> JIT utility-first CSS engine. You write class names in your markup; a build step scans your files and emits only the CSS you actually use. It looks Tailwind-like but the vocabulary is different and much more explicit.
+
+## The one thing to understand first
+
+Class names are **not** Tailwind names. The JIT part only affects which CSS is *emitted*; the set of valid class names is fixed and finite, and it is fully listed below.
+
+- `p-4` is **valid** but means `padding: 4px`, not `1rem`. A bare number is a legacy alias resolved as em, then px, then rem.
+- `text-sm`, `font-bold`, `items-center`, `flex-col`, `w-full` do **not** exist. Use `fs-0-875-rem`, `fw-700`, `align-items-center`, `flex-direction-column`, `w-100`.
+- There are **no colour utilities** at all. Theme through CSS variables (e.g. `--border`) or your own classes.
+- A class that does not match the vocabulary is **silently ignored** (no error, no CSS). If a layout is broken, check the class names first with `npx ukit-css validate <glob>`.
+
+### Valid but surprising (these DO compile)
+
+| Class | What it actually does |
+| --- | --- |
+| `p-4` | a bare number in the spacing family means px (after em), not rem — so p-4 is padding: 4px. Use p-1-rem for 1rem. |
+| `m-2` | 2px, not 0.5rem. The legacy bare-number alias resolves as em, then px, then rem. |
+| `p-1` | 1em, because em wins over px and rem for bare numbers. |
+| `w-50` | a bare number in the sizing family is always a percentage — w-50 is width: 50%. Use w-50px or w-50vw for units. |
+| `fs-1` | a bare number in the font-size family is rem — fs-1 is font-size: 1rem. |
+| `rounded-md` | 8px here, not Tailwind's 6px. The named radius scale is xs(2) sm(4) md(8) lg(12) xl(16) 2xl(24) full(9999). |
+| `lh-1-5` | the dash is a decimal point, so this is line-height: 1.5. |
+| `lh-4-5` | only 1, 2, 3, 4 and 1.5, 2.5, 3.5, 4.5 exist — there is no lh-1-25. |
+| `h-100vh` | viewport height works for h and w only. min-h and max-h accept pixels, so Tailwind's min-h-screen has no equivalent here. |
+| `border` | paints 1px solid var(--border); set --border to theme it. |
+| `animate-spin` | the only family emitted without !important, so it stays overridable. |
+
+## Grammar
+
+```
+<stem>-<value>[-m|-t]
+
+-m  mobile   max-width: 576px
+-t  tablet   577px .. 992px
+    (none)   all viewports
+```
+
+- Decimals become dashes: `1.5rem` -> `1-5-rem`
+- `px` attaches directly (`p-16px`); `rem`/`em`/`vh`/`vw` use a dash (`p-1-5-rem`)
+- Every utility except `animate-*` is emitted with `!important`
+- Vocabulary size: 4031 base utilities, 12092 with breakpoints
+- Known exception: `.border` has no `-t` (tablet) variant, because `.border-t` is already a different class.
+
+## Families
+
+| Family | Stems | Examples |
+| --- | --- | --- |
+| Background reset | `bg-transparent` `bg-none` | `bg-transparent`, `bg-none` |
+| Cursor | `cursor-` | `cursor-pointer`, `cursor-not-allowed`, `cursor-grab` |
+| Outline | `outline-none` | `outline-none` |
+| Pointer events | `pointer-events-none` `pointer-events-auto` | `pointer-events-none` |
+| Display | `d-` | `d-flex`, `d-grid`, `d-none`, `d-none-m`, `d-block-i` |
+| Sizing — percentages | `w-` `h-` | `w-50`, `h-100`, `w-100-m` |
+| Sizing — fixed pixels | `w-` `h-` `max-w-` `min-w-` `max-h-` `min-h-` | `w-320px`, `h-64px`, `max-w-1200`, `min-h-100` |
+| Sizing — viewport | `w-` `h-` | `w-100vw`, `h-100vh`, `h-50vh` |
+| Sizing — intrinsic & auto | `w-max-content` `w-min-content` `w-fit-content` `h-max-content` `h-min-content` `h-fit-content` `w-auto` `h-auto` | `w-fit-content`, `h-auto`, `w-max-content` |
+| Position | `position-` | `position-relative`, `position-absolute`, `position-fixed` |
+| Offsets | `top-` `bottom-` `left-` `right-` `start-` `end-` | `top-0`, `left-50-percent`, `bottom-16px`, `start-50` |
+| Transform helpers | `translate-x-center` `translate-x-neg-50` `translate-y-center` `translate-y-neg-50` `translate-center` `translate-middle` `transform-none` `rotate-90` | `translate-center`, `translate-x-center`, `rotate-90` |
+| Float | `float-` | `float-left`, `float-right` |
+| Clearfix | `clearfix` | `clearfix` |
+| Vertical align | `align-` | `align-middle`, `align-top` |
+| Flex alignment | `align-items-` `align-self-` `align-content-` | `align-items-center`, `align-self-start`, `align-content-stretch` |
+| Justification | `justify-content-` `justify-items-` `justify-self-` | `justify-content-between`, `justify-content-center`, `justify-items-center` |
+| Flex shorthand & wrap | `flex-` | `flex-1`, `flex-none`, `flex-wrap` |
+| Flex grow / shrink | `flex-grow-0` `flex-grow-1` `flex-shrink-0` `flex-shrink-1` | `flex-grow-1`, `flex-shrink-0` |
+| Flex direction | `flex-direction-` | `flex-direction-column`, `flex-direction-row` |
+| Flex flow | `flex-flow-` | `flex-flow-row-wrap` |
+| Object fit | `object-` | `object-cover`, `object-contain` |
+| Z-index | `z-` | `z-1`, `z-50`, `z-9999` |
+| Overflow | `overflow-` `overflow-x-` `overflow-y-` | `overflow-hidden`, `overflow-x-auto` |
+| Opacity | `opacity-` | `opacity-0`, `opacity-50`, `opacity-100` |
+| Spacing — margin, padding, gap | `m-` `mt-` `mb-` `ml-` `mr-` `ms-` `me-` `mx-` `my-` `p-` `pt-` `pb-` `pl-` `pr-` `ps-` `pe-` `px-` `py-` `gap-` | `m-1-rem`, `pt-16px`, `mx-auto`, `gap-1-5-rem`, `p-2-5-rem-m` |
+| Font size | `fs-` | `fs-1-rem`, `fs-16px`, `fs-1-5-rem` |
+| Font weight | `fw-` | `fw-400`, `fw-700`, `fw-bold` |
+| Text align, transform & ellipsis | `text-` | `text-center`, `text-uppercase`, `text-ellipsis-3` |
+| Line height | `lh-` | `lh-1`, `lh-1-5` |
+| White space | `ws-` | `ws-nowrap`, `ws-pre-wrap` |
+| Letter spacing | `letter-spacing-` | `letter-spacing-1`, `letter-spacing-0-1-em`, `letter-spacing-neg-2` |
+| Border radius | `rounded-` `border-radius-` | `rounded-lg`, `rounded-full`, `rounded-r-12px` |
+| Borders | `border` `border-none` `border-transparent` `border-t` `border-b` `border-l` `border-r` `border-s` `border-e` `border-t-none` `border-b-none` `border-l-none` `border-r-none` `border-s-none` `border-e-none` | `border`, `border-t`, `border-none` |
+| Grid columns | `grid-cols-` | `grid-cols-3`, `grid-cols-1-m` |
+| Grid column span | `grid-col-span-` | `grid-col-span-2` |
+| Grid rows | `grid-rows-` | `grid-rows-2` |
+| Grid row span | `grid-row-span-` | `grid-row-span-2` |
+| Grid auto flow | `grid-flow-` | `grid-flow-row`, `grid-flow-col-dense` |
+| Animations | `animate-fade-in` `animate-fade-in-up` `animate-fade-in-scale` `animate-slide-in-right` `animate-spin` `animate-pulse` | `animate-fade-in`, `animate-spin`, `animate-pulse` |
+
+## Tools you can run
+
+```bash
+npx ukit-css explain m-1-rem-m   # what a class compiles to, and at which breakpoint
+npx ukit-css validate "src/**/*.{html,tsx}"   # unknown-but-intended classes, with fixes
+npx ukit-css manifest -o ukit.manifest.json  # the full grammar as JSON
+npx ukit-css classes            # every valid class name, one per line
+```
+
+## Docs
+
+- [docs/classes.md](docs/classes.md): complete reference, every stem and value
+- [ukit.manifest.json](ukit.manifest.json): the same grammar as structured data
+- [ukit.classes.txt](ukit.classes.txt): the flat list of every valid class
+- [AGENTS.md](AGENTS.md): instructions for coding agents working on this repo

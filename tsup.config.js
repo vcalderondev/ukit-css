@@ -4,6 +4,7 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     engine: "src/engine.ts",
+    manifest: "src/manifest.ts",
     postcss: "src/postcss.ts",
     vite: "src/vite.ts",
     cli: "src/cli.ts",

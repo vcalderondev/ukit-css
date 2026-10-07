@@ -1,0 +1,19 @@
+# Everything that is not needed at runtime, or that is generated.
+.vscode/**
+.github/**
+test/**
+scripts/**
+node_modules/**
+
+# Never package a previously built archive into the next one.
+*.vsix
+
+# Dev/lint noise
+*.log
+*.tsbuildinfo
+.DS_Store
+.eslintrc*
+.prettierrc*
+
+# Keep these: extension.js, src/**, vendor/manifest.cjs, package.json,
+# README.md, LICENSE and manifest.json (fallback grammar for src/manifest.js).

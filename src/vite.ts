@@ -27,6 +27,8 @@ export interface ViteUkitOptions extends UkitConfig {
 }
 
 const DEFAULT_VIRTUAL = "virtual:ukit.css"
+/** Cap on warnings per build, so a big refactor cannot flood the console. */
+const MAX_WARNINGS = 12
 
 export default function ukitVite(options: ViteUkitOptions = {}): Plugin {
   const virtualId = options.virtualId ?? DEFAULT_VIRTUAL
@@ -35,6 +37,9 @@ export default function ukitVite(options: ViteUkitOptions = {}): Plugin {
   let engine: Engine | null = null
   let server: ViteDevServer | null = null
   let rootCwd = process.cwd()
+  let isServe = false
+  /** Tokens already reported, so HMR does not repeat itself. */
+  const reported = new Set<string>()
 
   async function ensureEngine() {
     if (engine) return engine
@@ -43,9 +48,35 @@ export default function ukitVite(options: ViteUkitOptions = {}): Plugin {
     const merged: UkitConfig = { ...fileConfig, ...options }
     delete (merged as ViteUkitOptions).configFile
     delete (merged as ViteUkitOptions).virtualId
+    // Diagnostics are a development aid: on by default in `vite dev`, opt-in
+    // for builds unless the user said otherwise.
+    if (merged.diagnostics === undefined) merged.diagnostics = isServe
     engine = new Engine(merged, rootCwd)
     await engine.scanAll()
     return engine
+  }
+
+  /**
+   * Report classes that look like utilities but match nothing. Without this the
+   * JIT fails silently: the class produces no CSS and no error.
+   */
+  function reportDiagnostics(diagnostics: readonly { token: string; suggestions: string[] }[]) {
+    if (!server || diagnostics.length === 0) return
+    const fresh = diagnostics.filter((d) => !reported.has(d.token))
+    if (fresh.length === 0) return
+    for (const d of fresh) reported.add(d.token)
+    const shown = fresh.slice(0, MAX_WARNINGS)
+    for (const d of shown) {
+      server.config.logger.warn(
+        `[ukit-css] "${d.token}" matches no utility class, so no CSS was emitted.` +
+          (d.suggestions.length > 0 ? ` Did you mean ${d.suggestions.join(", ")}?` : ""),
+      )
+    }
+    if (fresh.length > shown.length) {
+      server.config.logger.warn(
+        `[ukit-css] … and ${fresh.length - shown.length} more unmatched class names. Run \`npx ukit-css validate\` for the full list.`,
+      )
+    }
   }
 
   function invalidateVirtual() {
@@ -72,6 +103,7 @@ export default function ukitVite(options: ViteUkitOptions = {}): Plugin {
     enforce: "pre",
     configResolved(c) {
       rootCwd = c.root
+      isServe = c.command === "serve"
     },
     configureServer(devServer) {
       server = devServer
@@ -83,7 +115,8 @@ export default function ukitVite(options: ViteUkitOptions = {}): Plugin {
     async load(id) {
       if (id !== resolvedVirtual) return null
       const eng = await ensureEngine()
-      const { css, scannedFiles } = eng.build()
+      const { css, scannedFiles, diagnostics } = eng.build()
+      reportDiagnostics(diagnostics)
       // Register scanned files as deps so the virtual module is invalidated
       // when they change.
       for (const f of scannedFiles) this.addWatchFile(f)

@@ -1,0 +1,129 @@
+name: Publish VS Code extension
+
+# Manual on purpose: publishing to the Marketplace is a deliberate act, and a
+# Marketplace version can never be reused once it exists.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Where to publish'
+        required: true
+        default: marketplace
+        type: choice
+        options:
+          - marketplace
+          - openvsx
+          - both
+      dry_run:
+        description: 'Package and validate only (no upload)'
+        required: true
+        default: true
+        type: boolean
+  push:
+    tags:
+      - 'extension-v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+
+      # The extension vendors the built engine, so it must be built and
+      # verified on the exact commit being published.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the engine
+        run: npm run build
+
+      - name: Check generated artifacts are up to date
+        run: npm run generate:check
+
+      - name: Check the vendored engine matches dist
+        run: npm run check:vendor
+
+      - name: Test the extension
+        run: npm run test:extension
+
+      - name: Read the extension version
+        id: ext
+        run: |
+          NAME=$(node -p "require('./editors/vscode/package.json').name")
+          VERSION=$(node -p "require('./editors/vscode/package.json').version")
+          PUBLISHER=$(node -p "require('./editors/vscode/package.json').publisher")
+          echo "id=${PUBLISHER}.${NAME}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Publishing ${PUBLISHER}.${NAME}@${VERSION}"
+
+      # Re-publishing an existing Marketplace version fails, so skip early with
+      # a clear notice instead of an opaque error at the upload step.
+      - name: Check whether this version is already published
+        id: check
+        run: |
+          if npx --yes @vscode/vsce show "${{ steps.ext.outputs.id }}" --json > /tmp/show.json 2>/dev/null; then
+            if node -e '
+              const data = JSON.parse(require("fs").readFileSync("/tmp/show.json", "utf8"));
+              const want = process.argv[1];
+              const versions = Array.isArray(data.versions) ? data.versions : [];
+              process.exit(versions.some((v) => v && v.version === want) ? 0 : 1);
+            ' "${{ steps.ext.outputs.version }}"; then
+              echo "::notice::${{ steps.ext.outputs.id }}@${{ steps.ext.outputs.version }} is already on the Marketplace — skipping."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "::notice::Could not query the Marketplace (first release, or publisher not created yet)."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package the VSIX
+        working-directory: editors/vscode
+        run: npx --yes @vscode/vsce package --no-dependencies
+
+      - name: Upload the VSIX as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ukit-css-vsix
+          path: editors/vscode/*.vsix
+          if-no-files-found: error
+
+      - name: Publish to the VS Code Marketplace
+        if: |
+          steps.check.outputs.skip == 'false' &&
+          inputs.dry_run != true &&
+          (inputs.target == 'marketplace' || inputs.target == 'both' || github.event_name == 'push')
+        working-directory: editors/vscode
+        run: npx --yes @vscode/vsce publish --no-dependencies --packagePath "$(ls *.vsix)"
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      # Tag pushes publish to the Marketplace only. Use a manual dispatch with
+      # `target: both` when you also want Open VSX.
+      - name: Publish to Open VSX (Antigravity, Cursor, Windsurf, VSCodium)
+        if: |
+          steps.check.outputs.skip == 'false' &&
+          inputs.dry_run != true &&
+          (inputs.target == 'openvsx' || inputs.target == 'both')
+        working-directory: editors/vscode
+        run: npx --yes ovsx publish "$(ls *.vsix)" -p "$OVSX_PAT"
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+
+      - name: Summary
+        run: |
+          {
+            echo "### ukit-css extension"
+            echo ""
+            echo "- Version: \`${{ steps.ext.outputs.version }}\`"
+            echo "- Target: \`${{ inputs.target || 'marketplace (tag push)' }}\`"
+            echo "- Dry run: \`${{ inputs.dry_run }}\`"
+            echo "- Already published: \`${{ steps.check.outputs.skip }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

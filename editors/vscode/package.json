@@ -1,0 +1,89 @@
+{
+  "name": "ukit-css",
+  "displayName": "ukit-css IntelliSense",
+  "description": "Completions, hover docs, diagnostics and quick fixes for @vcalderondev/ukit-css utility classes. Backed by the engine's own generated manifest, so it can never drift from real behaviour.",
+  "version": "1.0.2",
+  "publisher": "vcalderondev",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "ukit",
+    "ukit-css",
+    "css",
+    "utility",
+    "jit",
+    "classnames"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vcalderondev/ukit-css.git",
+    "directory": "editors/vscode"
+  },
+  "homepage": "https://github.com/vcalderondev/ukit-css#readme",
+  "bugs": {
+    "url": "https://github.com/vcalderondev/ukit-css/issues"
+  },
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#0f172a",
+    "theme": "dark"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:html",
+    "onLanguage:vue",
+    "onLanguage:svelte",
+    "onLanguage:astro",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:php",
+    "onLanguage:blade",
+    "onLanguage:twig",
+    "onLanguage:erb",
+    "onLanguage:handlebars",
+    "onLanguage:liquid",
+    "onLanguage:markdown"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "ukit-css",
+      "properties": {
+        "ukitCss.completions.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Suggest ukit-css class names inside `class` / `className` attributes and class directives."
+        },
+        "ukitCss.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Warn about class tokens that are **not** valid ukit-css classes and have a close suggestion. Unknown names with no suggestion (BEM names, identifiers, file paths) are never reported."
+        },
+        "ukitCss.hover.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Show the exact generated CSS, the family, the breakpoint and suggestions when hovering a class name."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vendor": "node scripts/vendor.mjs",
+    "test": "node test/selftest.mjs && node test/integration.mjs",
+    "test:selftest": "node test/selftest.mjs",
+    "test:integration": "node test/integration.mjs",
+    "package:vsix": "npx --yes @vscode/vsce package --no-dependencies",
+    "publish:marketplace": "npx --yes @vscode/vsce publish --no-dependencies",
+    "publish:openvsx": "npx --yes ovsx publish"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

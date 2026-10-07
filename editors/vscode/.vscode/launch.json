@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run ukit-css extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "comment": "Open editors/vscode as the workspace folder, then press F5. Run `node scripts/vendor.mjs` first."
+    }
+  ]
+}
